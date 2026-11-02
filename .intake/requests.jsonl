@@ -1,0 +1,6 @@
+{"t":"add","id":1,"at":"2026-11-01T05:21:19.927Z","text":"Make a note to turn each little project into a project managed by a person or organization, like an open source repo","cwd":"/home/markfoster314/ayamai-deepseek","project":"design"}
+{"t":"add","id":2,"at":"2026-11-01T05:21:19.965Z","text":"Get started on a Game Boy emulator","cwd":"/home/markfoster314/ayamai-deepseek","project":"gb"}
+{"t":"add","id":3,"at":"2026-11-01T05:21:19.999Z","text":"Make an intake system where my requests are marked down to revisit and turn into actionable implementations","cwd":"/home/markfoster314/ayamai-deepseek","project":"tooling"}
+{"t":"add","id":4,"at":"2026-11-01T05:21:20.035Z","text":"Open my self-hosted git projects in local VS Code (as a workspace)","cwd":"/home/markfoster314/ayamai-deepseek","project":"tooling"}
+{"t":"promote","id":2,"at":"2026-11-01T05:21:28.992Z","planId":8,"project":"gb"}
+{"t":"promote","id":3,"at":"2026-11-01T05:21:29.062Z","planId":9,"project":"tooling"}

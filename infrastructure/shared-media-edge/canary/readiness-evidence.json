@@ -1,0 +1,60 @@
+{
+  "verifiedAt": "2026-10-30T00:01:59.673Z",
+  "workersPlan": "free",
+  "workersPlanEvidence": "Subscription API now succeeds and lists only the existing r2_paid subscription, no Workers Paid subscription; user dashboard reports the Free allowance of 100,000 requests/day.",
+  "accountId": "53dcf89689e1f019f32eacc9be31cd6b",
+  "permissions": {
+    "workersWrite": "verified",
+    "d1Write": "verified",
+    "r2BindingRead": "verified"
+  },
+  "bucket": {
+    "name": "ayamai-edge-canary",
+    "managedPublic": false,
+    "customDomains": 0,
+    "storageClass": "Standard"
+  },
+  "fixture": {
+    "key": "benign-test-pattern.mp4",
+    "bytes": 895998,
+    "contentType": "video/mp4"
+  },
+  "isolatedD1Id": "f64fbb8b-3092-497e-aaff-ca0d06a73776",
+  "isolationReview": "verified",
+  "privateIngress": "verified",
+  "budgetApprovedUsd": 3,
+  "costReview": "verified",
+  "deploymentPermission": "explicitly-approved",
+  "permissionPolicyReview": {
+    "source": "User-supplied account-scoped allow policy; connected credential policy cannot be read directly",
+    "workersScripts": "Read and Write",
+    "d1": "Read and Write",
+    "r2Storage": "Read",
+    "billingRead": "Verified after user update: subscription GET succeeded",
+    "connectedPolicyLookup": "unverified"
+  },
+  "observations": [
+    "The secure operator credential was supplied but failed the 32-character minimum. The provisioner stopped before constructing the Cloudflare client or uploading Workers; request an updated credential through secure input only.",
+    "2026-10-29: after user updated the credential, subscriptions GET returned 200 and only existing R2 Paid; this is not a Workers Paid plan. No subscription or account plan was changed.",
+    "2026-10-29: created only ayamai-edge-canary-db, initialized the canary schema, and independently verified its three canary tables and zero runs/metrics/budget rows. The application databases were not accessed.",
+    "No Workers have been uploaded yet. Gateway activation remains blocked on private ingress, fixture HEAD, runtime bindings and a new secure CANARY_OPERATOR_SECRET.",
+    "2026-10-29: user explicitly approved isolated canary resource creation only after checks pass; Free Workers, $3/month ceiling and production isolation remain mandatory.",
+    "2026-10-29: user reported dashboard usage of 0 / 100,000 requests today, consistent with Workers Free; independent account subscription verification remains blocked.",
+    "2026-10-29T23:41Z: fresh read-only checks again found no Worker scripts or D1 databases and confirmed the Standard canary bucket with managed public access disabled and no custom domains. Subscriptions still returned 403; no resources were created.",
+    "2026-10-29: provider GET confirmed Standard bucket metadata, managed r2.dev disabled and no custom domains.",
+    "2026-10-29: provider GET returned no Workers scripts and no D1 databases.",
+    "Account subscriptions returned 403 Authentication error; Free plan not verified.",
+    "Account-owned token verification succeeded with active status. Reading its permission policies returned 403 Unauthorized.",
+    "The user-owned token verification endpoint is not appropriate to this account-owned token; its 401 was not an invalid-credential diagnosis.",
+    "Credential reauthorization context cannot reconnect this API-key connection.",
+    "No write-scope probe, database creation, resource upload, publication or routing mutation was attempted.",
+    "The object was reported present by the user. Its HEAD has not been independently verified.",
+    "Never treat configuration, mocks or this evidence file as physical Safari measurements.",
+    "Verified live private authority service binding, exact R2 fixture HEAD, anonymous-control rejection, both transports HEAD/ranges and old-ticket privacy revocation. Gateway probe phase blocked all non-health paths before readiness passed.",
+    "REST packaging embeds the exact local harness files; no external assets, production API, production database or R2 S3 credentials.",
+    "All smoke checks are synthetic HTTP checks, NOT physical Safari playback or CPU evidence."
+  ],
+  "gatewayOrigin": "https://ayamai-edge-canary.markfoster314.workers.dev",
+  "physicalIphoneSamples": 0,
+  "workerCpuEvidence": "not-measured"
+}

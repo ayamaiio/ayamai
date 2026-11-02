@@ -1,0 +1,36 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "uta",
+  "name": "uta",
+  "version": "2026.11.02.9",
+  "description": "the music library: what you own, what you saved, and what to play next",
+  "faces": {
+    "play": "/"
+  },
+  "routes": [
+    {
+      "prefix": "/uta",
+      "service": "app"
+    }
+  ],
+  "services": [
+    {
+      "id": "app",
+      "name": "uta",
+      "port": 4670,
+      "health": "/uta/",
+      "start": {
+        "command": "node",
+        "args": [
+          "projects/uta/server.mjs"
+        ],
+        "env": {
+          "BASE_PREFIX": "/uta"
+        }
+      }
+    }
+  ],
+  "requires": [
+    "node>=20"
+  ]
+}

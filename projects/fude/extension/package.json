@@ -1,0 +1,33 @@
+{
+  "name": "ayamai-vscode",
+  "displayName": "ayamai",
+  "description": "Ask the model on this machine about the code in front of you.",
+  "version": "0.1.0",
+  "publisher": "ayamai",
+  "private": true,
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onCommand:ayamai.ask"],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "ayamai.ask", "title": "ayamai: ask about selection" },
+      { "command": "ayamai.status", "title": "ayamai: project status" }
+    ],
+    "configuration": {
+      "title": "ayamai",
+      "properties": {
+        "ayamai.token": {
+          "type": "string",
+          "default": "",
+          "description": "Agent token. Find it at ~/.local/share/ayamai/agent-token (Linux), ~/Library/Application Support/ayamai/agent-token (macOS), %APPDATA%\\ayamai\\agent-token (Windows)."
+        },
+        "ayamai.door": {
+          "type": "string",
+          "default": "http://ayamai.local",
+          "description": "Where the front door listens."
+        }
+      }
+    }
+  }
+}

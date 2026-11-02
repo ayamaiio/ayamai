@@ -1,0 +1,40 @@
+ayamai on MacBook (macOS)
+=======================
+
+Role: platform
+
+Run it, or paste the commands one at a time:
+
+  ./machines/macbook.command
+
+  pnpm install --frozen-lockfile    # the workspace
+  node packages/cli/index.mjs install    # the name on this machine (asks for your password once)
+  node packages/cli/index.mjs up    # the platform
+  node packages/cli/index.mjs doctor    # the check
+
+Then open
+
+  http://ayamai.local
+
+Xcode
+-----
+
+  Not needed. ayamai has no native modules; Xcode only buys python3,
+  git upgrades and Homebrew. Run ./machines/preflight.command to see
+  which Node installer this macOS can actually use.
+
+Notes for this machine
+---------------------
+
+  - No Xcode needed: ayamai has no native modules. Xcode only buys python3 (api, curator, storybook) and Homebrew, and brew is what needs Command Line Tools.
+  - No yoru vault here — /mnt/y/ayamai belongs to the other machine, so yoru reports itself absent. That is correct, not broken.
+  - Node 20.11 is the real floor, not 20: the platform uses import.meta.dirname.
+  - Updates arrive as `git pull` on the branch this checkout was cloned from; the private work remote carries that branch.
+
+Keeping it current
+------------------
+
+  cd <repo> && git pull
+
+The generated files are checked into git; edit machines/*.json and re-run
+`ayamai bootstrap <id>` to change one.

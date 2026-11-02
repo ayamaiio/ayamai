@@ -1,0 +1,37 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "gemu",
+  "name": "gemu",
+  "version": "2026.11.02.9",
+  "description": "everything playable: emulators, ROMs, Steam and the other launchers",
+  "faces": {
+    "play": "/?view=play",
+    "dev": "/?view=develop"
+  },
+  "routes": [
+    {
+      "prefix": "/gemu",
+      "service": "app"
+    }
+  ],
+  "services": [
+    {
+      "id": "app",
+      "name": "gemu",
+      "port": 4660,
+      "health": "/gemu/",
+      "start": {
+        "command": "node",
+        "args": [
+          "projects/gemu/server.mjs"
+        ],
+        "env": {
+          "BASE_PREFIX": "/gemu"
+        }
+      }
+    }
+  ],
+  "requires": [
+    "node>=20"
+  ]
+}

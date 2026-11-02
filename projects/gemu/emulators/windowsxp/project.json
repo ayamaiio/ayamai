@@ -1,0 +1,35 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "windowsxp",
+  "parent": "gemu",
+  "name": "windows xp",
+  "kind": "system",
+  "version": "2026.11.02.9",
+  "description": "Windows XP Professional SP3 — a machine from 2001, under QEMU",
+  "system": {
+    "name": "Windows XP Professional",
+    "version": "5.1.2600 (SP3)",
+    "author": "Microsoft",
+    "license": "proprietary — a licence key is required to install",
+    "homepage": "https://en.wikipedia.org/wiki/Windows_XP"
+  },
+  "emulator": {
+    "key": "qemu",
+    "runtime": "native",
+    "license": "GPL-2.0",
+    "upstream": {
+      "repo": "https://github.com/qemu/qemu",
+      "version": "11.1.0"
+    },
+    "config": {
+      "memory": 512,
+      "vga": "std",
+      "disk": "windows-xp.qcow2",
+      "diskGb": 8
+    }
+  },
+  "image": {
+    "path": "{vault}/system/windows-xp-sp3.iso",
+    "bytes": 618831872
+  }
+}

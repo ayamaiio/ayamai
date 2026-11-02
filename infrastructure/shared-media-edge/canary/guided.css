@@ -1,0 +1,76 @@
+/* Token CSS variables come from the bundled ayamai design-system styles. */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--app-font-sans, var(--font-sans)), system-ui, sans-serif;
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+}
+.shell {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: calc(var(--spacing) * 6) calc(var(--spacing) * 4);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 4);
+}
+h1 { font-size: var(--text-2xl); line-height: var(--text-2xl--line-height); margin: 0 0 calc(var(--spacing) * 2); font-weight: 600; }
+h2 { font-size: var(--text-lg); line-height: var(--text-lg--line-height); margin: 0; font-weight: 600; }
+p { margin: 0; }
+.eyebrow { font-size: var(--text-sm); color: hsl(var(--muted-foreground)); font-weight: 500; margin-bottom: var(--spacing); }
+.muted { color: hsl(var(--muted-foreground)); }
+.small { font-size: var(--text-sm); line-height: var(--text-sm--line-height); }
+.card {
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border: 1px solid hsl(var(--card-border));
+  border-radius: var(--radius-lg);
+  padding: calc(var(--spacing) * 5);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 3);
+}
+.instruction { font-size: var(--text-lg); line-height: var(--text-lg--line-height); font-weight: 500; }
+.confirm {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--muted-border));
+  border-radius: var(--radius-md);
+  padding: calc(var(--spacing) * 3);
+}
+.actions { display: flex; flex-direction: column; gap: calc(var(--spacing) * 2); }
+@media (min-width: 768px) { .actions { flex-direction: row; } }
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+.btn-primary { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border: 1px solid hsl(var(--primary-border, var(--primary))); }
+.btn-outline { background: transparent; color: hsl(var(--foreground)); border: 1px solid hsl(var(--border)); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn:focus-visible, video:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+progress {
+  width: 100%;
+  height: calc(var(--spacing) * 2);
+  accent-color: hsl(var(--primary));
+}
+.status { font-weight: 500; }
+video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: hsl(var(--muted));
+  border-radius: var(--radius-md);
+}
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}

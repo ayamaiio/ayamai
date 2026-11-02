@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>itch - gemu</title>
+<link rel="icon" href="/ui/brand/favicon.svg" type="image/svg+xml" />
+<style>
+  /* the platform's face, never the browser's */
+  button{appearance:none;-webkit-appearance:none}
+  /* the palette and the control face come from /ui/ui.css */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--void);color:var(--pale);font:300 14px/1.6 var(--sans)}
+  .bar{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 20px;
+       border-bottom:1px solid var(--line);font:400 9px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+  .bar b{font:400 18px var(--serif);letter-spacing:.08em;text-transform:none;color:var(--pale)}
+  .bar a{color:var(--dim);text-decoration:none;border-bottom:1px solid transparent}
+  .bar a:hover{color:var(--pale);border-bottom-color:var(--red)}
+  main{max-width:900px;margin:0 auto;padding:34px 24px 60px}
+  h1{font:400 34px/1.15 var(--serif);margin:0 0 4px}
+  .sub{color:var(--muted);font-style:italic;margin:0 0 26px}
+  .label{font:400 9px var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin:26px 0 10px}
+  .row{display:flex;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .row .kind{font:400 9px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim);min-width:58px}
+  .row .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .meta{font:9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  button{font:400 9px var(--mono);letter-spacing:.2em;text-transform:uppercase;cursor:pointer;padding:7px 12px}
+  button:hover:not(:disabled){border-color:var(--red)}
+  button:disabled{opacity:.4;cursor:default}
+  .hint{color:var(--dim);font-size:12px;line-height:1.7}
+  code{font:12px var(--mono);color:var(--rei)}
+  .problem{margin:18px 0;padding:12px 14px;border:1px solid var(--line);border-left:2px solid var(--red);color:var(--pale);font-size:12px}
+</style>
+<link rel="stylesheet" href="/ui/ui.css" />
+</head>
+<body>
+  <div class="bar">
+    <span><b>itch</b> games</span>
+    <span><a href="/gemu/">gemu</a></span>
+  </div>
+  <main>
+    <h1>itch</h1>
+    <p class="sub">Web builds play here. Native builds open their own window. Zips wait in the inbox.</p>
+
+    <div id="problem" class="problem" hidden></div>
+
+    <p class="label">games <span id="count"></span></p>
+    <div id="games"><p class="hint">reading the drives...</p></div>
+
+    <p class="label">zips</p>
+    <div id="zips"><p class="hint">nothing waiting</p></div>
+
+    <p class="label">the itch client</p>
+    <p class="hint" id="client"></p>
+
+    <p class="label">roots</p>
+    <div id="roots"></div>
+  </main>
+
+<script>
+(function () {
+  var problem = document.getElementById("problem");
+  var show = function (text) { problem.textContent = text; problem.hidden = false; };
+  var esc = function (text) { return String(text == null ? "" : text).replace(/[&<>"]/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); };
+  var size = function (bytes, kind) { if (kind === "native") return "own window"; var mb = (Number(bytes) || 0) / 1048576; if (mb >= 1024) return (mb / 1024).toFixed(1) + " GB"; if (mb >= 1) return Math.round(mb) + " MB"; return Math.max(1, Math.round((Number(bytes) || 0) / 1024)) + " KB"; };
+
+  function tile(game) {
+    var row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = '<span class="kind">' + esc(game.kind) + '</span><span class="name">' + esc(game.name) + '</span><span class="meta">' + size(game.bytes, game.kind) + '</span>';
+    var press = document.createElement("button"); press.className = "btn ghost sm";
+    if (game.kind === "web" || game.kind === "flash") {
+      press.textContent = "play";
+      press.disabled = game.kind === "flash" && !state.ruffle;
+      press.title = press.disabled ? "fetch Ruffle first" : "";
+      press.onclick = function () { location.href = "/gemu/itch/play/" + encodeURIComponent(game.id); };
+    } else {
+      press.textContent = "launch";
+      press.onclick = function () {
+        press.disabled = true;
+        fetch("/gemu/itch/launch", { method: "POST", headers: { "x-cockpit": "1", "content-type": "application/json" }, body: JSON.stringify({ id: game.id }) })
+          .then(function (response) { return response.json(); })
+          .then(function (answer) { if (!answer.ok) show(answer.error || "could not start it"); })
+          .catch(function () { show("gemu is not answering"); })
+          .then(function () { setTimeout(function () { press.disabled = false; }, 3000); });
+      };
+    }
+    row.appendChild(press);
+    return row;
+  }
+
+  var state = null;
+  function render(data) {
+    state = data;
+    document.getElementById("count").textContent = data.games.length ? data.games.length + " found" : "";
+    var host = document.getElementById("games");
+    host.innerHTML = "";
+    if (!data.games.length) host.innerHTML = '<p class="hint">nothing found yet. Add a root below, or drop a zip in the inbox.</p>';
+    data.games.forEach(function (game) { host.appendChild(tile(game)); });
+
+    var zips = document.getElementById("zips");
+    zips.innerHTML = "";
+    if (!data.zips.length) zips.innerHTML = '<p class="hint" id="inbox-hint"></p>';
+    data.zips.forEach(function (zip) {
+      var row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = '<span class="kind">zip</span><span class="name">' + esc(zip.name) + '</span><span class="meta">' + size(zip.bytes) + '</span>';
+      var press = document.createElement("button"); press.className = "btn ghost sm";
+      press.textContent = "install";
+      press.disabled = !zip.web;
+      press.title = zip.web ? "" : "no html inside - nothing this can run";
+      press.onclick = function () {
+        press.disabled = true;
+        press.textContent = "installing...";
+        fetch("/gemu/itch/install", { method: "POST", headers: { "x-cockpit": "1", "content-type": "application/json" }, body: JSON.stringify({ name: zip.name }) })
+          .then(function (response) { return response.json(); })
+          .then(function (answer) { if (!answer.ok) show(answer.error || "could not install"); else location.reload(); })
+          .catch(function () { show("gemu is not answering"); });
+      };
+      row.appendChild(press);
+      zips.appendChild(row);
+    });
+    if (data.inbox) {
+      var hint = document.getElementById("inbox-hint");
+      if (hint) hint.innerHTML = "drop a zip in <code>" + esc(data.inbox) + "</code> and press scan again";
+    }
+
+    var client = document.getElementById("client");
+    if (data.itchClient) client.innerHTML = "installed - its games are in the list above";
+    else client.innerHTML = 'not installed. gemu reads <code>' + esc(data.itchApps) + '</code> once it is. <button class="btn ghost sm" id="get-itch">install itch</button> for purchases.';
+    var get = document.getElementById("get-itch");
+    if (get) get.onclick = function () {
+      get.disabled = true;
+      fetch("/gemu/itch/client", { method: "POST", headers: { "x-cockpit": "1" } }).then(function () { show("winget is opening a window - finish it there, then reload"); });
+    };
+
+    var roots = document.getElementById("roots");
+    roots.innerHTML = "";
+    data.roots.forEach(function (root) {
+      var row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = '<span class="kind">' + (root.absent ? "absent" : "root") + '</span><span class="name">' + esc(root.root) + '</span><span class="meta">' + root.games + '</span>';
+      roots.appendChild(row);
+    });
+    if (data.duplicates) show(data.duplicates + " game(s) appear under more than one root - the first one wins");
+  }
+
+  fetch("/gemu/itch/state", { cache: "no-store" })
+    .then(function (response) { return response.json(); })
+    .then(render)
+    .catch(function () { show("gemu is not answering"); });
+})();
+</script>
+</body>
+</html>

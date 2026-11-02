@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>ayamai iPhone playback check</title>
+  <link rel="stylesheet" href="/guided.css">
+  <script src="/guided.js" type="module"></script>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">ayamai</p>
+      <h1>iPhone playback check</h1>
+      <p class="muted">This is a synthetic canary using a test video. It checks private-media playback on your iPhone; it is not a production access verification. Results are saved automatically and privately.</p>
+    </header>
+
+    <section class="card" aria-labelledby="step-heading">
+      <h2 id="step-heading">What to do</h2>
+      <p id="instruction" class="instruction">Open your private test link on iPhone Safari.</p>
+      <p class="confirm">Pressing the button confirms physical iPhone Safari and the network settings shown above. Keep Safari in the foreground while checks run.</p>
+      <div class="actions">
+        <button id="start" type="button" class="btn btn-primary" disabled>Start iPhone check</button>
+        <button id="stop" type="button" class="btn btn-outline" disabled>Stop</button>
+      </div>
+      <label for="progress" class="muted small">Progress</label>
+      <progress id="progress" max="8" value="0">0 of 8</progress>
+      <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true">Waiting for your private test link.</p>
+      <p id="saved" class="muted small"></p>
+    </section>
+
+    <section class="card" aria-labelledby="player-heading">
+      <h2 id="player-heading">Test video</h2>
+      <video id="player" muted playsinline controls preload="none" aria-label="Synthetic test video"></video>
+    </section>
+
+    <div id="compat" hidden>
+      <fieldset id="controls">
+        <legend>Compatibility controls</legend>
+        <label for="secret">Invitation</label>
+        <input id="secret" type="text" autocomplete="off">
+        <button id="connect" type="button">Connect</button>
+        <label><input id="physical" type="checkbox" checked> Physical iPhone</label>
+        <label for="network">Network</label>
+        <select id="network"><option value="wifi">wifi</option><option value="cellular">cellular</option></select>
+        <label for="transport">Transport</label>
+        <select id="transport"><option value="relay">relay</option><option value="edge">edge</option></select>
+        <button id="startup" type="button">Startup</button>
+        <button id="swipe" type="button">Swipe</button>
+        <button id="checks" type="button">Checks</button>
+        <button id="export" type="button">Export</button>
+        <pre id="summary"></pre>
+      </fieldset>
+    </div>
+  </main>
+</body>
+</html>

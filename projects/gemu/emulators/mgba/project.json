@@ -1,0 +1,27 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "mgba",
+  "parent": "gemu",
+  "name": "mgba",
+  "kind": "source",
+  "version": "2026.11.02.9",
+  "description": "GBA, Gameboy, Gameboy Color — forked from mGBA",
+  "upstream": {
+    "repo": "https://github.com/mgba-emu/mgba",
+    "license": "MPL-2.0",
+    "tag": ""
+  },
+  "fork": {
+    "repo": "",
+    "branch": "main"
+  },
+  "emulator": {
+    "key": "mgba",
+    "exe": "C:\\Program Files\\mGBA\\mGBA.exe",
+    "systems": [
+      "GBA",
+      "Gameboy",
+      "Gameboy Color"
+    ]
+  }
+}

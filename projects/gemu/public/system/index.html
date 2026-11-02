@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>systems · gemu</title>
+<link rel="icon" href="/ui/brand/favicon.svg" type="image/svg+xml" />
+<style>
+  /* the platform's face, never the browser's */
+  button{appearance:none;-webkit-appearance:none}
+  /* the palette and the control face come from /ui/ui.css */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--void);color:var(--pale);font:300 15px/1.6 var(--sans)}
+  .bar{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 20px;
+       border-bottom:1px solid var(--line);font:400 9px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+  .bar b{font:400 18px var(--serif);letter-spacing:.08em;text-transform:none;color:var(--pale)}
+  .bar .jp{color:var(--rei);font-size:10px;letter-spacing:.4em;margin-left:8px}
+  .bar a{color:var(--dim);text-decoration:none;border-bottom:1px solid transparent}
+  .bar a:hover{color:var(--pale);border-bottom-color:var(--red)}
+  main{max-width:640px;margin:0 auto;padding:9vh 24px 40px}
+  h1{font:400 44px/1.1 var(--serif);letter-spacing:.02em;margin:0 0 6px}
+  .sub{color:var(--muted);font-style:italic;margin:0 0 28px}
+  dl{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin:0 0 30px;font:400 11px var(--mono)}
+  dt{color:var(--dim);text-transform:uppercase;font-size:9px;letter-spacing:.2em;padding-top:2px}
+  dd{margin:0;color:var(--pale)}
+  .good{color:var(--ok)}.bad{color:var(--red)}
+  button{background:none;border:1px solid var(--line);border-radius:3px;color:var(--pale);padding:12px 18px;
+         font:400 10px var(--mono);letter-spacing:.24em;text-transform:uppercase;cursor:pointer}
+  button:hover:not(:disabled){border-color:var(--red)}
+  button:disabled{opacity:.45;cursor:default}
+  .note{margin-top:22px;font-size:12px;color:var(--dim);line-height:1.7}
+  code{font:12px var(--mono);color:var(--rei)}
+  .problem{margin-top:18px;padding:12px 14px;border:1px solid var(--line);border-left:2px solid var(--red);
+           color:var(--pale);font-size:12px}
+</style>
+<link rel="stylesheet" href="/ui/ui.css" />
+</head>
+<body>
+  <div class="bar">
+    <span><b id="name">system</b><span class="jp" id="jp"></span></span>
+    <span><a href="/gemu/">gemu</a></span>
+  </div>
+
+  <main>
+    <h1 id="title">&hellip;</h1>
+    <p class="sub" id="blurb"></p>
+
+    <dl>
+      <dt>image</dt><dd id="image">&hellip;</dd>
+      <dt>machine</dt><dd id="machine">&hellip;</dd>
+      <dt>runtime</dt><dd id="runtime">QEMU, native</dd>
+    </dl>
+
+    <button class="btn" id="launch" disabled>launch</button>
+    <div id="problem" class="problem" hidden></div>
+
+    <p class="note" id="note"></p>
+  </main>
+
+<script>
+(function () {
+  var parts = location.pathname.replace(/\/$/, "").split("/");
+  var ID = parts[parts.length - 1];
+  var BASE = "/gemu/system/" + ID;
+  var byId = function (id) { return document.getElementById(id); };
+  var launch = byId("launch");
+  var problem = byId("problem");
+
+  function show(text) { problem.textContent = text; problem.hidden = false; }
+
+  fetch(BASE + "/state", { cache: "no-store" })
+    .then(function (response) { return response.json(); })
+    .then(function (state) {
+      byId("name").textContent = state.label;
+      byId("jp").textContent = state.jp || "";
+      byId("title").textContent = state.title;
+      byId("blurb").textContent = state.blurb;
+      byId("note").textContent = state.note || "";
+      document.title = state.label + " \u00b7 gemu";
+      byId("image").innerHTML = state.image.exists
+        ? '<span class="good">' + Math.round(state.image.bytes / 1048576) + " MB</span> \u00b7 " + state.image.name
+        : '<span class="bad">missing</span> \u00b7 /mnt/y/ayamai/system/' + state.image.name;
+      byId("machine").innerHTML = state.qemu
+        ? '<span class="good">qemu</span>'
+        : '<span class="bad">not installed</span> \u00b7 <code>winget install SoftwareFreedomConservancy.QEMU</code>';
+      byId("runtime").textContent = state.disk
+        ? "QEMU, native \u2014 boots the installer, and keeps an 8 GB disk to install onto"
+        : "QEMU, native \u2014 a live CD, nothing written back";
+      launch.disabled = !state.ready;
+      if (!state.qemu) show("QEMU is not installed, and it is the only thing that gives this system a real CPU.");
+      else if (!state.image.exists) show("The image is not in the vault: copy " + state.image.name + " to /mnt/y/ayamai/system/");
+    })
+    .catch(function () { show("gemu is not answering."); });
+
+  launch.addEventListener("click", function () {
+    launch.disabled = true;
+    launch.textContent = "starting\u2026";
+    fetch(BASE + "/launch", { method: "POST", headers: { "x-cockpit": "1" } })
+      .then(function (response) { return response.json(); })
+      .then(function (result) {
+        if (!result.ok) { show(result.error || "could not start it"); launch.textContent = "launch"; launch.disabled = false; return; }
+        launch.textContent = "running";
+        setTimeout(function () { launch.textContent = "launch"; launch.disabled = false; }, 4000);
+      })
+      .catch(function () { launch.textContent = "launch"; launch.disabled = false; show("gemu is not answering."); });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# gitbox - keep your own copy of a repo, on your own disk.
+#
+#   gitbox init [name]     create <root>/<name>.git from the current checkout,
+#                          add it as remote "box", and mirror every ref to it
+#   gitbox list            list hosted repos
+#   gitbox path <name>     print the bare repo path
+#   gitbox clone <name> [dir]
+#
+# Root defaults to /mnt/y/git and is overridable with GITBOX_ROOT.
+set -euo pipefail
+
+ROOT="${GITBOX_ROOT:-/mnt/y/git}"
+command="${1:-help}"
+shift || true
+
+usage() {
+  sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+case "$command" in
+  init)
+    top="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+    [ -n "$top" ] || { echo "gitbox: not inside a git checkout" >&2; exit 1; }
+    name="${1:-$(basename "$top")}"
+    bare="$ROOT/$name.git"
+    mkdir -p "$ROOT"
+    if [ ! -d "$bare" ]; then
+      git init --bare -q "$bare"
+      echo "created $bare"
+    else
+      echo "existing $bare"
+    fi
+    cd "$top"
+    if git remote get-url box >/dev/null 2>&1; then
+      git remote set-url box "$bare"
+    else
+      git remote add box "$bare"
+    fi
+    # Every branch we know about becomes a real branch in the box, with local
+    # branches taking precedence over their remote-tracking equivalents.
+    git push -q --prune box \
+      "+refs/remotes/origin/*:refs/heads/*" \
+      "+refs/heads/*:refs/heads/*" \
+      "+refs/tags/*:refs/tags/*"
+    # A bare repo defaults to master; point HEAD at the real default branch.
+    git -C "$bare" symbolic-ref HEAD "refs/heads/$(git symbolic-ref --short HEAD)"
+    refs=$(git -C "$bare" for-each-ref --format='%(refname)' | wc -l)
+    size=$(du -sh "$bare" | cut -f1)
+    echo "mirrored $refs refs ($size) -> remote 'box'"
+    ;;
+
+  list)
+    [ -d "$ROOT" ] || { echo "no repos at $ROOT"; exit 0; }
+    for d in "$ROOT"/*.git; do
+      [ -d "$d" ] || continue
+      n=$(git -C "$d" for-each-ref --format='%(refname)' | wc -l)
+      printf '%-28s %4s refs  %6s\n' "$(basename "$d" .git)" "$n" "$(du -sh "$d" | cut -f1)"
+    done
+    ;;
+
+  path)
+    echo "$ROOT/${1:?name required}.git"
+    ;;
+
+  clone)
+    name="${1:?name required}"
+    git clone "$ROOT/$name.git" "${2:-$name}"
+    ;;
+
+  help|*) usage ;;
+esac

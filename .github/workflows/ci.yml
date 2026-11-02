@@ -1,0 +1,51 @@
+name: CI
+
+# The platform's own suite. The media-era pipeline (curator, founder access, GOD
+# feeds, disposable Postgres) belonged to the old product and is archived with it.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  platform:
+    name: typecheck, tests, docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Tests (platform, products, tools, ui, docs)
+        run: pnpm test
+
+      - name: Documentation has no dead links
+        run: pnpm check:docs
+
+
+      - name: Registry is valid
+        run: node --input-type=module -e "import { loadRegistry } from './packages/core/registry.mjs'; const r = loadRegistry(process.cwd()); if (r.invalid.length) { console.error(r.invalid); process.exit(1); } console.log(r.projects.length + ' projects, ' + r.children.length + ' children');"
+
+      - name: Nothing generated was left dirty
+        run: git diff --exit-code

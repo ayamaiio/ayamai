@@ -1,0 +1,38 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "retroarch",
+  "parent": "gemu",
+  "name": "retroarch",
+  "kind": "source",
+  "version": "2026.11.02.9",
+  "description": "NES, SNES, Gameboy, Gameboy Color, GBA, N64, Sega MasterSystem, Sega Game Gear, Sega Saturn, TurboGrafx-16, Wonderswan, Wonderswan Color, Neo Geo Pocket Color, Atari 2600 — forked from RetroArch",
+  "upstream": {
+    "repo": "https://github.com/libretro/RetroArch",
+    "license": "GPL-3.0",
+    "tag": ""
+  },
+  "fork": {
+    "repo": "",
+    "branch": "main"
+  },
+  "emulator": {
+    "key": "retroarch",
+    "exe": "C:\\RetroArch-Win64\\retroarch.exe",
+    "systems": [
+      "NES",
+      "SNES",
+      "Gameboy",
+      "Gameboy Color",
+      "GBA",
+      "N64",
+      "Sega MasterSystem",
+      "Sega Game Gear",
+      "Sega Saturn",
+      "TurboGrafx-16",
+      "Wonderswan",
+      "Wonderswan Color",
+      "Neo Geo Pocket Color",
+      "Atari 2600"
+    ]
+  }
+}

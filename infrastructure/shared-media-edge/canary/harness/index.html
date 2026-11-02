@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ayamai · Isolated Safari canary</title></head>
+<body>
+<h1>Isolated iPhone Safari canary</h1>
+<p>Benign synthetic fixture only. Not the application Library. No production data. Android is deferred.</p>
+<p>This compares a Cloudflare relay-shaped API with edge delivery. It is not a performance measurement of the production PostgreSQL API.</p>
+<label>Canary operator secret <input id="secret" type="password" autocomplete="off"></label>
+<button id="connect">Check ingress and start isolated run</button>
+<fieldset id="controls" disabled>
+<legend>Physical-device measurements</legend>
+<label><input id="physical" type="checkbox">I am operating a physical iPhone in Safari, not an emulator.</label>
+<p><label>Network <select id="network"><option value="wifi">Wi-Fi · disable cellular</option><option value="cellular">Cellular · disable Wi-Fi</option></select></label>
+<label>Transport <select id="transport"><option value="relay">Relay-shaped API</option><option value="edge">Edge Worker</option></select></label></p>
+<p>Confirm network in iOS Settings before each batch. Network labels are operator declarations; the browser cannot prove the radio used. Keep Safari foregrounded and disable Low Power Mode for comparable results.</p>
+<button id="startup">Collect 30 startup attempts</button>
+<button id="swipe">Collect 30 swipe-to-ready attempts</button>
+<button id="stop">Stop and retain partial results</button>
+<button id="checks">Check ranges, seeks, cancellation and revocation</button>
+</fieldset>
+<p id="status" role="status">Not connected. Preparation does not mean deployed or tested.</p>
+<video id="player" muted playsinline controls preload="none" width="280"></video>
+<p><button id="export" disabled>Download sanitized evidence JSON</button></p>
+<pre id="summary"></pre>
+<script type="module" src="/measure.js"></script>
+</body></html>

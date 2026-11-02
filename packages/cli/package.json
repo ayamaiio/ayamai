@@ -1,0 +1,9 @@
+{
+  "name": "@ayamai/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The ayamai command: status, doctor, up, down, open.",
+  "bin": { "ayamai": "./index.mjs" },
+  "dependencies": { "@ayamai/core": "workspace:*" }
+}

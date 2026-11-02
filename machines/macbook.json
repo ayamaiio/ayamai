@@ -1,0 +1,13 @@
+{
+  "id": "macbook",
+  "label": "MacBook",
+  "os": "darwin",
+  "role": "platform",
+  "sudo": true,
+  "notes": [
+    "No Xcode needed: ayamai has no native modules. Xcode only buys python3 (api, curator, storybook) and Homebrew, and brew is what needs Command Line Tools.",
+    "No yoru vault here — /mnt/y/ayamai belongs to the other machine, so yoru reports itself absent. That is correct, not broken.",
+    "Node 20.11 is the real floor, not 20: the platform uses import.meta.dirname.",
+    "Updates arrive as `git pull` on the branch this checkout was cloned from; the private work remote carries that branch."
+  ]
+}

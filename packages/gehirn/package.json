@@ -1,0 +1,10 @@
+{
+  "name": "@ayamai/gehirn",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "gehirn: the control panel. Projects, services, actions, the model console.",
+  "bin": { "ayamai-gehirn": "./entry.mjs" },
+  "scripts": { "test": "node --test" },
+  "dependencies": { "@ayamai/llm": "workspace:*" }
+}

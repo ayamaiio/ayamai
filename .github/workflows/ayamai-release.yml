@@ -1,0 +1,56 @@
+name: release
+
+# `ayamai publish` tags `release/YYYY.MM.DD-N`, which is what runs this:
+#   curl -fsSL https://github.com/ayamaiio/ayamai/releases/latest/download/install.sh | sh
+
+on:
+  push:
+    tags: ["release/*", "v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: enable pnpm
+        run: corepack enable
+
+      - name: install
+        run: pnpm install --frozen-lockfile
+
+      - name: platform tests before shipping
+        run: node --test packages/*/*.test.mjs
+
+      - name: pack the platform
+        run: |
+          VERSION="${GITHUB_REF_NAME##*/}"
+          VERSION="${VERSION:-0.0.0}"
+          # Write outside the tree: a tarball inside the directory being archived
+          # makes tar report "file changed as we read it" and fail.
+          tar --exclude-vcs \
+              --exclude=node_modules \
+              --exclude=.local \
+              --exclude='*.tsbuildinfo' \
+              -czf "/tmp/ayamai-${VERSION}.tar.gz" .
+          cp "/tmp/ayamai-${VERSION}.tar.gz" "ayamai-${VERSION}.tar.gz"
+          cp "ayamai-${VERSION}.tar.gz" ayamai-latest.tar.gz
+          # The installer fetches this alongside the tarball.
+          cp scripts/install.sh install.sh
+          ls -lh ayamai-*.tar.gz install.sh
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ayamai-*.tar.gz
+            install.sh
+          generate_release_notes: true
+          fail_on_unmatched_files: true

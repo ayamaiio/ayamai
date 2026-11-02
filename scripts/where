@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# where - show where everything lives, and open it in Explorer.
+#
+#   where                 list every place, with sizes
+#   where open <name>     open that place in Windows Explorer
+#   where path <name>     print its Windows path (handy for piping)
+#
+# Places are the box first: the vault on Y:, then the code, then the tooling.
+set -u
+
+places() {
+  cat <<EOF
+vault|/mnt/y/ayamai
+media|/mnt/y/ayamai/media
+state|/mnt/y/ayamai/state
+git|/mnt/y/git
+backups|/mnt/y/ayamai/backups
+harvest|/mnt/y/ayamai/harvest
+code|$HOME/ayamai-deepseek
+scripts|$HOME/ayamai-deepseek/scripts
+plans|$HOME/ayamai-deepseek/.plan
+local|$HOME/ayamai-deepseek/.local
+EOF
+}
+
+lookup() {
+  places | awk -F'|' -v want="$1" '$1 == want { print $2 }'
+}
+
+describe() {
+  case "$1" in
+    vault)   echo "the box: media, state, git, backups" ;;
+    media)   echo "$(find /mnt/y/ayamai/media -type f 2>/dev/null | wc -l) files" ;;
+    state)   echo "activity.json, plan databases" ;;
+    git)     echo "$(find /mnt/y/git -maxdepth 1 -name '*.git' 2>/dev/null | wc -l) bare repos" ;;
+    backups) echo "second-copy target, currently unused" ;;
+    harvest) echo "drop zone for incoming files" ;;
+    code)    echo "the working checkout" ;;
+    scripts) echo "import-local-dir, plan, gitbox, publish-activity" ;;
+    plans)   echo "$(wc -l < "$HOME/ayamai-deepseek/.plan/events.jsonl" 2>/dev/null || echo 0) events" ;;
+    local)   echo "runtime env, logs, service state" ;;
+    *)       echo "" ;;
+  esac
+}
+
+command="${1:-list}"
+case "$command" in
+  list|"")
+    printf '%-10s %-46s %s\n' "PLACE" "WINDOWS PATH" "WHAT"
+    places | while IFS='|' read -r name path; do
+      win="$(wslpath -w "$path" 2>/dev/null || echo "$path")"
+      [ -e "$path" ] || win="$win (missing)"
+      if [ ${#win} -gt 44 ]; then win="...${win: -41}"; fi
+      printf '%-10s %-44s %s\n' "$name" "$win" "$(describe "$name")"
+    done
+    echo
+    echo "free on Y: $(df -h /mnt/y | tail -1 | awk '{print $4}')   open: where open <place>"
+    ;;
+
+  open)
+    target="${2:-}"
+    [ -n "$target" ] || { echo "where: name required (try 'where')" >&2; exit 1; }
+    path="$(lookup "$target")"
+    [ -n "$path" ] || { echo "where: no place named $target" >&2; exit 1; }
+    [ -e "$path" ] || { echo "where: $path does not exist" >&2; exit 1; }
+    explorer.exe "$(wslpath -w "$path")" >/dev/null 2>&1 &
+    echo "opened $target -> $(wslpath -w "$path")"
+    ;;
+
+  path)
+    target="${2:-}"
+    [ -n "$target" ] || { echo "where: name required" >&2; exit 1; }
+    path="$(lookup "$target")"
+    [ -n "$path" ] || { echo "where: no place named $target" >&2; exit 1; }
+    wslpath -w "$path"
+    ;;
+
+  *)
+    echo "where: unknown command $command" >&2
+    echo "usage: where [open|path] [place]" >&2
+    exit 1
+    ;;
+esac

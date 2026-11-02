@@ -1,0 +1,37 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "templeos",
+  "parent": "gemu",
+  "name": "templeos",
+  "kind": "system",
+  "version": "2026.11.02.9",
+  "description": "TempleOS 5.03 — a real 64-bit machine under QEMU",
+  "system": {
+    "name": "TempleOS",
+    "version": "5.03",
+    "author": "Terry A. Davis",
+    "license": "public domain",
+    "homepage": "https://templeos.org/"
+  },
+  "emulator": {
+    "key": "qemu",
+    "runtime": "native",
+    "license": "GPL-2.0",
+    "upstream": {
+      "repo": "https://github.com/qemu/qemu",
+      "version": "11.1.0"
+    },
+    "config": {
+      "memory": 512,
+      "vga": "std"
+    },
+    "rejects": {
+      "v86": "32-bit only; TempleOS refuses to boot without long mode (copy/v86#133)"
+    }
+  },
+  "image": {
+    "path": "{vault}/system/TempleOS.ISO",
+    "bytes": 17350656,
+    "md5": null
+  }
+}

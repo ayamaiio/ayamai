@@ -1,0 +1,472 @@
+{
+  "what": "the plan board before the foundation was settled",
+  "retiredAt": "2026-11-02T07:19:52.415Z",
+  "fromCommit": "b7df404378f1c4d3a8fe7142db8367a74b534d27",
+  "eventsInLog": 77,
+  "counts": {
+    "items": 18,
+    "open": 15,
+    "ideas": 12
+  },
+  "items": [
+    {
+      "id": 3,
+      "title": "Verify the library works with the network unplugged",
+      "body": "Local-founder mode, filesystem media, local Postgres. Claimed offline; not yet proven end to end.",
+      "project": "yoru",
+      "priority": 1,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "doing",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T03:02:06.984Z",
+      "updated": "2026-11-02T01:24:03.551Z"
+    },
+    {
+      "id": 5,
+      "title": "Video preview backfill",
+      "body": "Previews are generated on demand and nothing enqueues them for imported rows. ~2,300 videos need a backfill.",
+      "project": "yoru",
+      "priority": 2,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "doing",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T03:02:07.067Z",
+      "updated": "2026-11-02T01:19:07.044Z"
+    },
+    {
+      "id": 2,
+      "title": "Second copy of the vault",
+      "body": "385 GB of irreplaceable media on a single SSD. No cloud copy by design. Needs a durability story.",
+      "project": "yoru",
+      "priority": 1,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "blocked",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T03:02:06.945Z",
+      "updated": "2026-11-02T01:38:01.723Z"
+    },
+    {
+      "id": 12,
+      "title": "Capture panel: an in-page ayamai overlay with actions, not a floating badge",
+      "body": "",
+      "project": "yoru",
+      "priority": 1,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T08:37:15.979Z",
+      "updated": "2026-11-02T01:19:07.110Z"
+    },
+    {
+      "id": 18,
+      "title": "Add a per-project activity signal endpoint that returns last-touched timestamp and open-work count",
+      "body": "from idea #1 · A way to see which projects are quiet and which are on fire, at a glance\n\nExpose a single read endpoint on the platform that, for each registered project, returns the most recent activity timestamp and the count of open items (uncommitted files, open plans, pending intake). Done when the endpoint returns data for all six projects and a contract test pins the response shape.",
+      "project": "hisho",
+      "priority": 1,
+      "labels": [
+        "idea:1"
+      ],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-02T01:33:23.401Z",
+      "updated": "2026-11-02T01:34:29.377Z"
+    },
+    {
+      "id": 4,
+      "title": "ayamai CLI: import, status, verify",
+      "body": "Terminal is the first-class interface. The web app shrinks to viewing images, playing video, seeking.",
+      "project": "yoru",
+      "priority": 2,
+      "labels": [],
+      "files": [
+        "scripts/status",
+        "scripts/where"
+      ],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T03:02:07.024Z",
+      "updated": "2026-11-02T01:19:07.144Z"
+    },
+    {
+      "id": 10,
+      "title": "Decide: fork Chromium, wrap it in Electron, or stay on the extension",
+      "body": "",
+      "project": "yoru",
+      "priority": 2,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T08:11:22.823Z",
+      "updated": "2026-11-02T01:19:07.175Z"
+    },
+    {
+      "id": 11,
+      "title": "Inbox view: everything captured, grouped by post, ready to label",
+      "body": "",
+      "project": "yoru",
+      "priority": 2,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T08:11:22.865Z",
+      "updated": "2026-11-02T01:19:07.206Z"
+    },
+    {
+      "id": 13,
+      "title": "Gallery posts: page through the 30 attachments inside the loop",
+      "body": "",
+      "project": "yoru",
+      "priority": 2,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T09:13:14.447Z",
+      "updated": "2026-11-02T01:19:07.237Z"
+    },
+    {
+      "id": 17,
+      "title": "Device install matrix: mac minis, laptops, Linux boxes, phones",
+      "body": "One checklist per class of machine, each with the evidence that it works: node source (tarball vs brew vs distro), hosts entry, port 80 mechanism (launchd / systemd / netsh portproxy), autostart, doctor output. The Mac laptop is done; a second Mac and a fresh Linux box are next.",
+      "project": "platform",
+      "priority": 2,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-02T00:31:32.556Z",
+      "updated": "2026-11-02T01:48:02.864Z"
+    },
+    {
+      "id": 19,
+      "title": "Define quiet and on-fire thresholds as configurable platform settings",
+      "body": "from idea #1 · A way to see which projects are quiet and which are on fire, at a glance\n\nAdd named settings for the quiet cutoff (no activity for N days) and the on-fire cutoff (open items above M or activity within H hours), with sane defaults and a documented precedence order. Done when the thresholds can be changed without a code deploy and the signal endpoint reflects the new values.",
+      "project": "hisho",
+      "priority": 2,
+      "labels": [
+        "idea:1"
+      ],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-02T01:33:23.434Z",
+      "updated": "2026-11-02T01:34:29.409Z"
+    },
+    {
+      "id": 6,
+      "title": "Activity covers previews and labels, not just imports",
+      "body": "The status line assumes every job is an import. It should report preview generation and label sync too.",
+      "project": "yoru",
+      "priority": 3,
+      "labels": [],
+      "files": [
+        "artifacts/api-server/src/routes/activity.ts",
+        "artifacts/api-server/src/routes/index.ts",
+        "artifacts/private-media-library/src/components/activity-line.tsx",
+        "artifacts/private-media-library/src/App.tsx",
+        "scripts/publish-activity.mjs"
+      ],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T03:02:07.114Z",
+      "updated": "2026-11-02T01:19:07.269Z"
+    },
+    {
+      "id": 7,
+      "title": "Decide: one box, or boxes that talk",
+      "body": "Invites, follows and feeds only make sense if boxes are networked. Everything downstream depends on this.",
+      "project": "yoru",
+      "priority": 3,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T03:02:07.153Z",
+      "updated": "2026-11-02T01:19:07.300Z"
+    },
+    {
+      "id": 15,
+      "title": "Install ayamai on the TV in the living room",
+      "body": "Same shape as the Mac install: one privileged step, door on 80, autostart at login/boot. TVs have no shell — the realistic path is the LAN door (:25223) opened in the browser, or a Raspberry Pi / Apple TV app if that proves too limited. Decide which before building.",
+      "project": "platform",
+      "priority": 3,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-02T00:31:32.484Z",
+      "updated": "2026-11-02T01:48:02.897Z"
+    },
+    {
+      "id": 16,
+      "title": "Install ayamai on the game consoles",
+      "body": "PS5 and Xbox have no user shell and no browser worth using; Switch has neither. Realistic: a console browser pointing at the LAN door for the media surfaces, not the platform. Record what each console's browser actually supports before promising anything.",
+      "project": "platform",
+      "priority": 4,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "todo",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-02T00:31:32.521Z",
+      "updated": "2026-11-02T01:48:02.930Z"
+    },
+    {
+      "id": 1,
+      "title": "Local import registers as a first-class job",
+      "body": "Importer writes to media_items but never creates a job, so the app cannot see it. Per-file rows vs aggregate counters is the open decision.",
+      "project": "yoru",
+      "priority": 1,
+      "labels": [],
+      "files": [
+        "scripts/import-local-dir.mjs"
+      ],
+      "mode": "",
+      "status": "done",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T03:02:06.911Z",
+      "updated": "2026-11-02T01:38:11.590Z"
+    },
+    {
+      "id": 8,
+      "title": "Get started on a Game Boy emulator",
+      "body": "Captured 2026-11-01 from /home/markfoster314/ayamai-deepseek.\n\nGet started on a Game Boy emulator",
+      "project": "platform",
+      "priority": 2,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "done",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T05:21:28.986Z",
+      "updated": "2026-11-02T01:48:02.965Z"
+    },
+    {
+      "id": 9,
+      "title": "Make an intake system where my requests are marked down to revisit and turn into",
+      "body": "Captured 2026-11-01 from /home/markfoster314/ayamai-deepseek.\n\nMake an intake system where my requests are marked down to revisit and turn into actionable implementations",
+      "project": "platform",
+      "priority": 3,
+      "labels": [],
+      "files": [],
+      "mode": "",
+      "status": "done",
+      "assignee": null,
+      "leaseUntil": null,
+      "created": "2026-11-01T05:21:29.056Z",
+      "updated": "2026-11-02T01:48:02.998Z"
+    }
+  ],
+  "ideas": [
+    {
+      "ts": "2026-11-02T01:33:08.251Z",
+      "t": "idea",
+      "id": 1,
+      "text": "A way to see which projects are quiet and which are on fire, at a glance",
+      "project": "ayamai",
+      "mode": "quick"
+    },
+    {
+      "ts": "2026-11-02T01:33:15.174Z",
+      "t": "draft",
+      "id": 1,
+      "stories": [
+        {
+          "title": "Add a per-project activity signal endpoint that reports last-touched time and open work counts",
+          "project": "hisho",
+          "priority": 1,
+          "body": "Expose an endpoint that, for each project, returns the timestamp of the most recent activity plus counts of open plans, uncommitted files, and pending tasks pulled from the ledger. Done when the endpoint returns a stable JSON shape for all six projects and is covered by a test with fixture data."
+        },
+        {
+          "title": "Compute a quiet/on-fire status per project from the activity signal",
+          "project": "hisho",
+          "priority": 1,
+          "body": "Turn the raw activity signal into a coarse status (quiet, warm, on-fire) using thresholds on recency and open-work volume, with the thresholds defined in one place. Done when each project resolves to exactly one status and unit tests cover the boundary cases."
+        },
+        {
+          "title": "Render a status strip on the panel showing every project's quiet/on-fire state",
+          "project": "gehirn",
+          "priority": 2,
+          "body": "Add a compact strip at the top of the panel that shows each project as a colored chip reflecting its status, with the project name and a tooltip of the underlying counts. Done when the strip loads from the status endpoint and visibly distinguishes quiet from on-fire projects in a manual check."
+        },
+        {
+          "title": "Poll the status endpoint and refresh the strip without a full page reload",
+          "project": "gehirn",
+          "priority": 3,
+          "body": "Have the panel re-fetch status on an interval and update the chips in place, showing a subtle stale indicator if a fetch fails. Done when a status change made on the backend appears in the strip within one polling cycle and a failed fetch leaves the last known state visible."
+        }
+      ]
+    },
+    {
+      "ts": "2026-11-02T01:33:23.363Z",
+      "t": "draft",
+      "id": 1,
+      "stories": [
+        {
+          "title": "Add a per-project activity signal endpoint that returns last-touched timestamp and open-work count",
+          "project": "ayamai",
+          "priority": 1,
+          "body": "Expose a single read endpoint on the platform that, for each registered project, returns the most recent activity timestamp and the count of open items (uncommitted files, open plans, pending intake). Done when the endpoint returns data for all six projects and a contract test pins the response shape."
+        },
+        {
+          "title": "Define quiet and on-fire thresholds as configurable platform settings",
+          "project": "ayamai",
+          "priority": 2,
+          "body": "Add named settings for the quiet cutoff (no activity for N days) and the on-fire cutoff (open items above M or activity within H hours), with sane defaults and a documented precedence order. Done when the thresholds can be changed without a code deploy and the signal endpoint reflects the new values."
+        },
+        {
+          "title": "Compute a per-project heat state from the activity signal",
+          "project": "hisho",
+          "priority": 1,
+          "body": "Have the secretary derive a single heat state per project (quiet, warm, on-fire) from the platform signal and thresholds, keeping the rule in one place. Done when a unit test covers each state boundary and the computed state is exposed for the panel to read."
+        },
+        {
+          "title": "Render a heat strip of all projects on the panel home",
+          "project": "gehirn",
+          "priority": 1,
+          "body": "Add a compact horizontal strip at the top of the panel home showing one chip per project, colored by heat state and labeled with the project name. Done when all six projects appear, colors match the kata tokens, and clicking a chip navigates to that project."
+        },
+        {
+          "title": "Add a heat state token set and chip component to the design library",
+          "project": "kata",
+          "priority": 2,
+          "body": "Define quiet, warm, and on-fire color tokens with accessible contrast and build a reusable heat chip component that consumes them. Done when the tokens and component are documented in the editor and the panel uses the component rather than ad-hoc styles."
+        },
+        {
+          "title": "Show per-project heat and last-activity detail in the seiri project list",
+          "project": "seiri",
+          "priority": 3,
+          "body": "Add a heat column and a relative last-activity timestamp to the existing project list so the strip has a drill-down view. Done when each row shows the state and timestamp, and sorting by heat works."
+        }
+      ]
+    },
+    {
+      "ts": "2026-11-02T01:33:23.440Z",
+      "t": "accept",
+      "id": 1,
+      "planIds": [
+        18,
+        19
+      ]
+    },
+    {
+      "ts": "2026-11-02T01:34:14.745Z",
+      "t": "idea",
+      "id": 2,
+      "text": "probe",
+      "project": null,
+      "mode": "quick"
+    },
+    {
+      "ts": "2026-11-02T01:34:14.788Z",
+      "t": "accept",
+      "id": 2,
+      "planIds": [
+        20
+      ]
+    },
+    {
+      "ts": "2026-11-02T01:34:20.957Z",
+      "t": "idea",
+      "id": 3,
+      "text": "probe three",
+      "project": null,
+      "mode": "quick"
+    },
+    {
+      "ts": "2026-11-02T01:34:21.049Z",
+      "t": "accept",
+      "id": 3,
+      "planIds": [
+        21
+      ]
+    },
+    {
+      "ts": "2026-11-02T01:35:28.055Z",
+      "t": "archive",
+      "id": 2
+    },
+    {
+      "ts": "2026-11-02T01:35:28.064Z",
+      "t": "archive",
+      "id": 3
+    },
+    {
+      "ts": "2026-11-02T01:38:26.376Z",
+      "t": "idea",
+      "id": 4,
+      "text": "project names in gehirn should be clickable, clicking the \"seiri\" title should open up \"seiri\" etc",
+      "project": "gehirn",
+      "mode": "unpack"
+    },
+    {
+      "ts": "2026-11-02T01:38:29.442Z",
+      "t": "draft",
+      "id": 4,
+      "stories": [
+        {
+          "title": "Make project titles in gehirn clickable links to their project pages",
+          "project": "gehirn",
+          "priority": 1,
+          "body": "Render each project name in the gehirn project list as a link that navigates to that project's detail page (e.g. clicking \"seiri\" opens the seiri page). Done when every listed project title is a working link and clicking it routes to the correct project route."
+        },
+        {
+          "title": "Add project detail route and page shell for each project in gehirn",
+          "project": "gehirn",
+          "priority": 1,
+          "body": "Create a route in gehirn that resolves a project id (ayamai, gehirn, yoru, seiri, kata, hisho) and renders a basic detail page showing the project name and description. Done when visiting each project's URL renders its page without errors and unknown ids show a not-found state."
+        },
+        {
+          "title": "Style clickable project titles with hover and focus affordances",
+          "project": "gehirn",
+          "priority": 2,
+          "body": "Apply kata tokens so project titles look interactive (hover underline/color, visible keyboard focus ring) while staying consistent with the panel's existing typography. Done when titles are keyboard-focusable, show a clear focus state, and pass a quick visual check against the design tokens."
+        },
+        {
+          "title": "Handle unknown or missing project ids gracefully on project pages",
+          "project": "gehirn",
+          "priority": 3,
+          "body": "When a project route receives an id that does not match a known project, show a friendly not-found message with a link back to the project list instead of crashing or rendering blank. Done when navigating to a bogus project URL shows the fallback and the back link returns to the list."
+        }
+      ]
+    }
+  ]
+}

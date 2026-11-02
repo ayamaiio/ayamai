@@ -1,0 +1,25 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "pcsx2",
+  "parent": "gemu",
+  "name": "pcsx2",
+  "kind": "source",
+  "version": "2026.11.02.9",
+  "description": "PS2 — forked from PCSX2",
+  "upstream": {
+    "repo": "https://github.com/PCSX2/pcsx2",
+    "license": "LGPL-3.0",
+    "tag": ""
+  },
+  "fork": {
+    "repo": "",
+    "branch": "main"
+  },
+  "emulator": {
+    "key": "pcsx2",
+    "exe": "C:\\Program Files\\PCSX2\\pcsx2-qt.exe",
+    "systems": [
+      "PS2"
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# status - one screen: every project on this machine, and what state it is in.
+#
+#   status            print once
+#   status --watch    refresh every 5s until Ctrl+C
+set -u
+
+WATCH=0
+[ "${1:-}" = "--watch" ] && WATCH=1
+
+plan_open() {
+  local dir="$1/.plan"
+  [ -f "$dir/events.jsonl" ] || { echo "-"; return; }
+  PLAN_DIR="$dir" node -e '
+    const fs = require("fs");
+    let t = "";
+    try { t = fs.readFileSync(process.env.PLAN_DIR + "/events.jsonl", "utf8"); } catch { console.log(0); process.exit(); }
+    const m = new Map();
+    for (const line of t.split("\n")) {
+      if (!line.trim()) continue;
+      let e; try { e = JSON.parse(line); } catch { continue; }
+      if (e.t === "add") m.set(e.id, { status: "todo" });
+      else if (e.t === "set" && m.has(e.id)) Object.assign(m.get(e.id), e.fields);
+      else if (e.t === "rm") m.delete(e.id);
+    }
+    console.log([...m.values()].filter((i) => i.status !== "done").length);
+  '
+}
+
+render() {
+  printf '%-22s %-24s %-6s %-12s %s\n' "PROJECT" "BRANCH" "DIRTY" "LAST COMMIT" "OPEN"
+  printf '%-22s %-24s %-6s %-12s %s\n' "----------------------" "------------------------" "-----" "-----------" "----"
+
+  local total_open=0 total_dirty=0
+  while IFS= read -r repo; do
+    [ -d "$repo/.git" ] || continue
+    local name branch dirty last open
+    name="$(basename "$repo")"
+    branch="$(git -C "$repo" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
+    dirty="$(git -C "$repo" status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
+    last="$(git -C "$repo" log -1 --format='%cr' 2>/dev/null || echo 'no commits')"
+    last="${last/ ago/}"
+    open="$(plan_open "$repo")"
+    case "$open" in (*[!0-9]*|"") ;; (*) total_open=$((total_open + open));; esac
+    [ "$dirty" != "0" ] && total_dirty=$((total_dirty + 1))
+    printf '%-22s %-24s %-6s %-12s %s\n' "$name" "${branch:0:24}" "$dirty" "${last:0:12}" "$open"
+  done < <(find "$HOME" -maxdepth 3 -type d -name .git -not -path "*/.nvm/*" -not -path "*/node_modules/*" 2>/dev/null | sed 's#/\.git$##' | sort)
+
+  echo
+  while IFS= read -r repo; do
+    [ -d "$repo/.plan" ] || continue
+    out="$(PLAN_DIR="$repo/.plan" node "$HOME/ayamai-deepseek/toys/plan/plan.mjs" dirty --repo "$repo" 2>/dev/null)"
+    [ -n "$out" ] || continue
+    echo
+    echo "uncommitted - $(basename "$repo")"
+    printf '%s\n' "$out" | sed 's/^/  /'
+  done < <(find "$HOME" -maxdepth 3 -type d -name .git -not -path "*/.nvm/*" 2>/dev/null | sed 's#/\.git$##' | sort)
+
+  echo "projects $total_open open plans, $total_dirty with uncommitted work"
+  echo "vault    $(du -sh /mnt/y/ayamai 2>/dev/null | cut -f1) used, $(df -h /mnt/y | tail -1 | awk '{print $4}') free"
+  echo "git box  $(find /mnt/y/git -maxdepth 1 -name '*.git' 2>/dev/null | wc -l) repos"
+  local af=/mnt/y/ayamai/state/activity.json
+  if [ -f "$af" ] && [ $(( $(date +%s) - $(stat -c %Y "$af") )) -le 90 ]; then
+    echo "working  $(cat "$af")"
+  else
+    echo "working  idle"
+  fi
+}
+
+if [ "$WATCH" = "1" ]; then
+  while true; do clear; date '+%H:%M:%S'; echo; render; sleep 5; done
+else
+  render
+fi

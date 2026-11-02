@@ -1,0 +1,10 @@
+{
+  "name": "@ayamai/agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The local task API tools talk to.",
+  "bin": { "ayamai-agent": "./index.mjs" },
+  "scripts": { "test": "node --test index.test.mjs" },
+  "dependencies": { "@ayamai/core": "workspace:*", "@ayamai/llm": "workspace:*" }
+}

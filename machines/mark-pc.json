@@ -1,0 +1,12 @@
+{
+  "id": "mark-pc",
+  "label": "Mark-PC (WSL)",
+  "os": "linux",
+  "role": "platform",
+  "sudo": true,
+  "notes": [
+    "The platform runs inside WSL; the browser and its hosts file belong to Windows, and the CLI writes the right one.",
+    "yoru's vault is /mnt/y/ayamai on this machine; docker is required for yoru's services.",
+    "This is the machine that publishes: `ayamai publish` writes the org repo, and `git push work packaged` carries the branch to the MacBook."
+  ]
+}

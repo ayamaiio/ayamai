@@ -1,0 +1,33 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "fude",
+  "name": "fude",
+  "version": "2026.11.02.9",
+  "description": "the editor extension: ask the door from VS Code",
+  "routes": [
+    {
+      "prefix": "/fude",
+      "service": "app"
+    }
+  ],
+  "services": [
+    {
+      "id": "app",
+      "name": "fude",
+      "port": 4656,
+      "health": "/fude/",
+      "start": {
+        "command": "node",
+        "args": [
+          "projects/fude/server.mjs"
+        ],
+        "env": {
+          "BASE_PREFIX": "/fude"
+        }
+      }
+    }
+  ],
+  "requires": [
+    "node>=20"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "ayamai \u2014 selected media",
+  "version": "0.1.0",
+  "description": "Explicitly select one supported image or video, then review it in your own ayamai account.",
+  "permissions": [
+    "activeTab",
+    "debugger",
+    "declarativeNetRequest",
+    "downloads",
+    "scripting",
+    "storage"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Capture this post to ayamai"
+  },
+  "incognito": "not_allowed",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  },
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "https://*.pixiv.net/*",
+    "https://*.pximg.net/*",
+    "https://www.pixiv.net/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "overlay.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false,
+      "exclude_matches": [
+        "http://localhost/*",
+        "https://localhost/*",
+        "http://127.0.0.1/*",
+        "https://127.0.0.1/*",
+        "http://[::1]/*"
+      ]
+    }
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "pixiv",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
+}

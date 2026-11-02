@@ -1,0 +1,32 @@
+ayamai on Mark-PC (WSL) (Linux)
+=============================
+
+Role: platform
+
+Run it, or paste the commands one at a time:
+
+  ./machines/mark-pc.sh
+
+  pnpm install --frozen-lockfile    # the workspace
+  node packages/cli/index.mjs install    # the name on this machine (asks for your password once)
+  node packages/cli/index.mjs up    # the platform
+  node packages/cli/index.mjs doctor    # the check
+
+Then open
+
+  http://ayamai.local
+
+Notes for this machine
+---------------------
+
+  - The platform runs inside WSL; the browser and its hosts file belong to Windows, and the CLI writes the right one.
+  - yoru's vault is /mnt/y/ayamai on this machine; docker is required for yoru's services.
+  - This is the machine that publishes: `ayamai publish` writes the org repo, and `git push work packaged` carries the branch to the MacBook.
+
+Keeping it current
+------------------
+
+  cd <repo> && git pull
+
+The generated files are checked into git; edit machines/*.json and re-run
+`ayamai bootstrap <id>` to change one.
