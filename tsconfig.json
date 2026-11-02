@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./projects/yoru/db"
+    },
+    {
+      "path": "./projects/yoru/api-client-react"
+    },
+    {
+      "path": "./projects/yoru/api-zod"
+    }
+  ]
+}

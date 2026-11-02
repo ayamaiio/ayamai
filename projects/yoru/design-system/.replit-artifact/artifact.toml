@@ -1,0 +1,19 @@
+kind = "design-system"
+previewPath = "/ayamai-design-system/"
+title = "ayamai — Design System"
+description = "The shared visual foundations and component reference for ayamai: a sophisticated media-first experience with dark indigo surfaces, slate blue accents and pale ivory typography inspired by the provided Rei Ayanami color reference."
+version = "1.0.0"
+id = "artifacts/ayamai-design-system"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/ayamai-design-system/" ]
+localPort = 20593
+
+[services.development]
+run = "pnpm --filter @workspace/ayamai-design-system run dev"
+
+[services.env]
+PORT = "20593"
+BASE_PATH = "/ayamai-design-system/"

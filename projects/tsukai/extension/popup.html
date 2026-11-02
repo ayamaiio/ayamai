@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>ayamai</title>
+  <style>
+    :root { --void:#0b0d14; --pale:#e6ecff; --line:#202a5a; --rei:#a9b7e8; --dim:#a3adc3; }
+    body { width: 360px; margin: 0; padding: 14px; background: var(--void); color: var(--pale);
+           font: 12px/1.6 Inter, ui-sans-serif, system-ui, sans-serif; }
+    .brand { font-family: Georgia, serif; letter-spacing: .34em; text-transform: uppercase; font-size: 11px; }
+    .tool { font-family: ui-monospace, monospace; font-size: 9px; letter-spacing: .24em; color: var(--dim); }
+    label { display: block; font: 500 9px/1 ui-monospace, monospace; letter-spacing: .22em;
+            text-transform: uppercase; color: var(--dim); margin: 12px 0 4px; }
+    textarea, input { width: 100%; box-sizing: border-box; background: #11141f; color: var(--pale);
+                      border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px;
+                      font: inherit; font-size: 12px; outline: none; }
+    textarea { min-height: 68px; resize: vertical; }
+    .row { display: flex; gap: 8px; margin-top: 12px; }
+    button { flex: 1; background: rgba(32,42,90,.5); color: var(--pale); border: 1px solid var(--line);
+             border-radius: 6px; padding: 7px 10px; font: inherit; cursor: pointer; }
+    button:hover { border-color: var(--rei); }
+    button:disabled { opacity: .5; cursor: default; }
+    #answer { margin-top: 12px; padding: 9px 10px; min-height: 40px; border: 1px solid var(--line);
+              border-radius: 6px; font: 11px/1.6 ui-monospace, monospace; white-space: pre-wrap; color: var(--pale); }
+    .hint { color: var(--dim); font: 10px/1.5 ui-monospace, monospace; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="brand">ayamai</div><div class="tool">browser</div>
+
+  <label for="token">token</label>
+  <input id="token" type="password" placeholder="from ~/.ayamai/agent-token" autocomplete="off" />
+
+  <label for="prompt">ask about this page</label>
+  <textarea id="prompt" placeholder="summarise it, name the artist, is this a series…"></textarea>
+
+  <div class="row">
+    <button id="ask">ask</button>
+    <button id="capture">capture</button>
+  </div>
+
+  <div id="answer"></div>
+  <div class="hint" id="hint"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+/* The logo and the wordmark, in one place.
+ *
+ * Loaded by every surface through the door: <link rel="stylesheet" href="/ui/brand.css">.
+ * The typefaces come with it, so no page depends on what the host happens to have
+ * installed — that is what made gehirn's wordmark render differently from seiri's.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap");
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--pale);
+  text-decoration: none;
+  line-height: 1;
+}
+.brand img.mark {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+  opacity: .9;
+  align-self: center;
+  flex: none;
+}
+.brand .word {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: .42em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.brand .jp {
+  font-family: var(--serif);
+  font-size: 11px;
+  letter-spacing: .42em;
+  color: var(--dim);
+  opacity: .55;
+  line-height: 1;
+}
+.brand .slash {
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--red);
+  line-height: 1;
+}
+.brand .tool {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--dim);
+  line-height: 1;
+}
+.brand:hover .word { color: var(--ink); }
+.brand:hover img.mark { opacity: 1; }
+
+@media (max-width: 620px) {
+  .brand { gap: 9px; }
+  .brand .word { letter-spacing: .3em; }
+}

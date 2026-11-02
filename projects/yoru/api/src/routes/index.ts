@@ -1,0 +1,60 @@
+import { Router, type IRouter } from "express";
+import curatorRouter from "./curator";
+import healthRouter from "./health";
+import mediaRouter from "./media";
+import storageRouter from "./storage";
+import watchRouter from "./watch";
+import importsRouter from "./imports";
+import activityRouter from "./activity";
+import mangaRouter from "./manga";
+import albumsRouter from "./albums";
+import afterHoursRouter from "./after-hours";
+import cloudAccountsRouter from "./cloud-accounts";
+import socialRouter from "./social";
+import creatorFollowsRouter from "./creator-follows";
+import videosRouter from "./videos";
+import annotationsRouter from "./annotations";
+import labelDatasetsRouter from "./label-datasets";
+import mediaStreamRouter from "./media-stream";
+import mediaPreviewsRouter from "./media-previews";
+import edgeMediaRouter from "./edge-media";
+import galleryPostsRouter from "./gallery-posts";
+import membershipRouter from "./membership";
+import accessRouter from "./access";
+import playbackBookmarksRouter from "./playback-bookmarks";
+import watchScrollRouter from "./watch-scroll";
+import captureUrlRouter from "./capture-url";
+import { requireAppMembership } from "../middlewares/requireAuth";
+
+const router: IRouter = Router();
+
+router.use(healthRouter);
+router.use(membershipRouter);
+router.use(accessRouter);
+// The service-only edge authorization route is mounted before this guard and
+// performs its own fresh membership check against the ticket's viewer.
+router.use(edgeMediaRouter);
+if (process.env.AYAMAI_CURATOR_ENABLED === "true" && process.env.NODE_ENV === "development" && process.env.HOST === "127.0.0.1") router.use(curatorRouter);
+router.use(captureUrlRouter);
+router.use(requireAppMembership);
+router.use(activityRouter);
+router.use(mangaRouter);
+router.use(albumsRouter);
+router.use(afterHoursRouter);
+router.use(playbackBookmarksRouter);
+router.use(watchScrollRouter);
+router.use(galleryPostsRouter);
+router.use(mediaStreamRouter);
+router.use(mediaPreviewsRouter);
+router.use(annotationsRouter);
+router.use(labelDatasetsRouter);
+router.use(socialRouter);
+router.use(creatorFollowsRouter);
+router.use(videosRouter);
+router.use(storageRouter);
+router.use(mediaRouter);
+router.use(watchRouter);
+router.use(importsRouter);
+router.use(cloudAccountsRouter);
+
+export default router;

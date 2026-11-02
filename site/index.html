@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="theme-color" content="#0b0d14" />
+<title>ayamai — a local-first AI agent platform</title>
+<meta property="og:type" content="website" />
+<meta property="og:title" content="ayamai — a local-first AI agent platform" />
+<meta property="og:description" content="Private, invite-only. One door at ayamai.local." />
+<meta property="og:image" content="https://ayamai-io.pages.dev/img/card.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="description" content="ayamai is a local-first AI agent platform. Private and invite-only." />
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/brand/favicon-32x32.png" sizes="32x32" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400&display=swap" />
+<style>
+  :root {
+    /* the schedule: --intro-end is the seam. change it, and every beat below
+       moves with the opening. */
+    /* the opening, measured from load */
+    --brand-name: 0.10s;
+    --brand-logo: 1.60s;   /* the word stands alone for a moment */
+    --brand-jp:   1.60s;   /* the mark and the kana arrive together */
+    --brand-out:  4.00s;
+    --quote-in:   6.60s;   /* the black holds between the two */
+    --who-name:   8.70s;
+    --who-role:   11.00s;   /* a longer beat before the credential */
+    --quote-out:  13.20s;
+    --intro-end:  14.30s;   /* the black is fully gone here */
+    --t-a:      calc(var(--intro-end) + 0.05s);
+    --t-type:   calc(var(--intro-end) + 1.70s);
+    --t-ai:     calc(var(--intro-end) + 3.50s);
+    --t-slogan: calc(var(--intro-end) + 5.20s);
+    --t-slash:  calc(var(--intro-end) + 6.80s);
+    --t-stance: calc(var(--intro-end) + 8.30s);
+    --t-door:   calc(var(--intro-end) + 11.50s);
+
+    --lilac: #a9b7e8;
+    --bg: #0b0d14; --ink: #e6ecff; --pale: #b9c2da; --dim: #7f89a3; --line: #1d2233; --rei: #ff3b5c;
+    --serif: "Cormorant Garamond", Georgia, serif;
+    --sans: Inter, system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    margin: 0; background: var(--bg); color: var(--pale);
+    font: 300 16px/1.75 var(--sans);
+    min-height: 100dvh; display: flex; flex-direction: column;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  main.wrap { flex: 1; width: 100%; display: grid; place-items: center; }
+  ::selection { background: var(--rei); color: #fff; }
+  a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
+  a:hover { border-color: var(--rei); }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 28px; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 30px 28px 26px; max-width: 780px; margin: 0 auto;
+    font: 400 10px var(--mono); letter-spacing: .34em; text-transform: uppercase;
+  }
+  header.top .mark {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--ink); letter-spacing: .42em; font-size: 15px; font-family: var(--mono);
+  }
+  header.top .mark img { width: 20px; height: 20px; object-fit: contain; opacity: .9; }
+  header.top .mark span { color: var(--dim); letter-spacing: .22em; font-size: 10px; }
+  header.top nav { display: flex; gap: 16px; }
+  header.top nav a { border: 0; color: var(--dim); }
+  header.top nav a:hover { color: var(--ink); }
+
+  .content { width: 100%; padding: 0; }
+  .content h1 { margin: 0; font: 300 54px/1.06 var(--serif); color: var(--ink); letter-spacing: -0.005em; }
+  .content h1 em { font-style: italic; color: var(--pale); }
+  .title .typed { position: relative; display: inline-block; }
+  .title .lf { display: inline-block; }
+  .title .caret {
+    position: absolute; left: 0; top: .16em; width: 2px; height: .82em;
+    background: var(--pale); opacity: 0;
+  }
+
+  .content .sub { margin: 20px 0 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; }
+  .content .jp { font: 400 11px var(--mono); letter-spacing: .52em; color: var(--dim); }
+  .content .sub .sep { font: 400 12px var(--mono); color: var(--dim); opacity: .55; }
+  .content .more { font: italic 300 17px/1 var(--serif); color: var(--pale); opacity: .85; letter-spacing: .01em; }
+  .content .slash { display: block; width: 44px; height: 2px; background: var(--rei); margin: 34px 0 0; }
+  .stance { margin: 22px 0 0; font: 400 10px var(--mono); letter-spacing: .26em; text-transform: uppercase; color: var(--dim); }
+
+  /* the opening: the quote alone, then it clears */
+  .intro {
+    position: fixed; inset: 0; z-index: 40;
+    background: var(--bg);
+    display: grid; place-content: center; gap: 24px;
+    padding: 0 28px;
+    animation: introClear 500ms ease calc(var(--intro-end) - 0.5s) forwards;
+  }
+  .intro blockquote {
+    margin: 0; max-width: 22ch;
+    font: 300 34px/1.25 var(--serif); color: var(--ink);
+    opacity: 0; transform: translateY(22px);
+    animation: introRise 600ms cubic-bezier(.22,.61,.36,1) var(--quote-in) forwards,
+               quoteOut 450ms ease var(--quote-out) forwards;
+  }
+  .intro .who {
+    margin: 0; display: flex; flex-direction: column; gap: 12px;
+    font: 400 10px var(--mono); letter-spacing: .28em; text-transform: uppercase;
+  }
+  .intro .who span {
+    display: block;
+    opacity: 0; transform: translateY(12px);
+    animation: introRise 500ms cubic-bezier(.22,.61,.36,1) var(--who-name) forwards,
+               quoteOut 450ms ease var(--quote-out) forwards;
+  }
+  .intro .who .name { color: var(--pale); }
+  .intro .who .role { color: var(--dim); animation-delay: var(--who-role), var(--quote-out); }
+  @keyframes introRise { to { opacity: 1; transform: none; } }
+  @keyframes quoteOut { to { opacity: 0; } }
+  @keyframes introClear { to { opacity: 0; visibility: hidden; } }
+
+  /* the brand, alone, before it joins the bar */
+  .intro-brand {
+    position: fixed; inset: 0; z-index: 41;
+    background: var(--bg);
+    display: grid; place-items: center;
+    pointer-events: none;
+    animation: brandOut 1600ms ease var(--brand-out) forwards;
+  }
+  /* the word sits dead centre; the mark and the kana hang off it, so nothing
+     moves when they arrive */
+  .intro-brand .mark { position: relative; display: grid; place-items: center; }
+  .intro-brand .name {
+    font: 400 46px/1 var(--mono); letter-spacing: .38em; color: var(--ink);
+    opacity: 0; animation: brandPieceIn 650ms ease var(--brand-name) forwards;
+  }
+  .intro-brand .logo-wrap {
+    position: absolute; left: 50%; bottom: 100%; margin-bottom: 40px; transform: translateX(-50%);
+  }
+  .intro-brand .logo {
+    display: block; width: 112px; height: 112px; object-fit: contain;
+    opacity: 0; transform: scale(.96);
+    animation: brandLogoIn 1600ms cubic-bezier(.22,.61,.36,1) var(--brand-logo) forwards;
+  }
+  .intro-brand .jp {
+    position: absolute; left: 50%; top: 100%; margin-top: 30px; transform: translateX(-50%);
+    font: 400 13px/1 var(--mono); letter-spacing: .5em; color: var(--lilac);
+    opacity: 0; animation: brandPieceIn 1600ms ease var(--brand-jp) forwards;
+  }
+
+  @keyframes brandPieceIn { to { opacity: 1; } }
+  @keyframes brandLogoIn { to { opacity: .95; transform: scale(1); } }
+  @keyframes brandOut { to { opacity: 0; } }
+
+  .content .action {
+    margin: 46px auto 0;
+    display: block; width: fit-content; padding: 13px 18px; border: 1px solid var(--line); border-radius: 3px;
+    font: 400 10px var(--mono); letter-spacing: .26em; text-transform: uppercase;
+    color: var(--ink); border-bottom-width: 1px;
+  }
+  .content .action:hover { border-color: var(--rei); color: #fff; }
+
+
+  footer.wrap {
+    width: 100%; margin-top: auto; padding: 64px 28px 32px; display: flex; gap: 14px; justify-content: space-between;
+    align-items: baseline; flex-wrap: wrap;
+    font: 400 10px var(--mono); letter-spacing: .28em; text-transform: uppercase; color: var(--dim);
+  }
+  footer a { border: 0; color: var(--dim); }
+  footer a:hover { color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro, .intro-brand { display: none; }
+    main.wrap { opacity: 1; animation: none; transform: none; }
+  }
+
+  @media (max-width: 620px) {
+    header.top { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .content h1 { font-size: 38px; }
+    .stance { letter-spacing: .16em; font-size: 9px; }
+    .intro blockquote { font-size: 26px; }
+    footer.wrap { padding: 48px 28px 26px; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+  .piece { opacity: 0; transform: translateY(6px); animation: pieceIn 500ms cubic-bezier(.22,.61,.36,1) var(--t-a) forwards; }
+  .piece.em, .piece.em-dot { animation-duration: 600ms; animation-delay: var(--t-ai); }
+  .sub.piece { animation-duration: 450ms; animation-delay: var(--t-slogan); }
+  .slash.piece { opacity: 0; transform: none; width: 0;
+                 animation: pieceIn 380ms ease var(--t-slash) forwards,
+                            slashDraw 380ms ease var(--t-slash) forwards; }
+  .stance.piece { animation-duration: 340ms; animation-delay: var(--t-stance); }
+  .action.piece { animation-duration: 420ms; animation-delay: var(--t-door); }
+
+  .title .lf span {
+    opacity: 0;
+    animation: letterIn 90ms linear forwards;
+    animation-delay: calc(var(--t-type) + var(--i) * 58ms);
+  }
+  .title .caret {
+    animation: caretMove 640ms steps(11, end) var(--t-type) forwards,
+               caretBlink 160ms steps(2, end) var(--t-type) 5 forwards,
+               caretOff 200ms ease calc(var(--t-type) + 700ms) forwards;
+  }
+}
+
+@keyframes pieceIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes letterIn { to { opacity: 1; } }
+@keyframes slashDraw { to { width: 44px; } }
+@keyframes caretMove { to { left: 100%; } }
+@keyframes caretBlink { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+@keyframes caretOff { to { opacity: 0; } }
+
+  </style>
+</head>
+<body>
+
+<section class="intro">
+  <blockquote>“An idiot admires complexity, a genius admires simplicity.”</blockquote>
+  <p class="who"><span class="name">Terry A. Davis</span><span class="role">creator of TempleOS</span></p>
+</section>
+
+<div class="intro-brand">
+  <div class="mark">
+    <div class="logo-wrap"><img class="logo" src="/brand/mark.png" alt="" width="112" height="112" /></div>
+    <div class="name">AYAMAI</div>
+    <div class="jp">アヤマイ</div>
+  </div>
+</div>
+
+<header class="top">
+  <div class="mark"><img src="/brand/mark.png" alt="" width="20" height="20" />AYAMAI<span>アヤマイ</span></div>
+</header>
+
+<main class="wrap">
+  <section class="content">
+    <h1 class="title"><span class="piece a">A</span> <span class="typed"><span class="lf"><span style="--i:0">l</span><span style="--i:1">o</span><span style="--i:2">c</span><span style="--i:3">a</span><span style="--i:4">l</span><span style="--i:5">-</span><span style="--i:6">f</span><span style="--i:7">i</span><span style="--i:8">r</span><span style="--i:9">s</span><span style="--i:10">t</span></span><i class="caret" aria-hidden="true"></i></span> <em class="piece em">AI agent platform</em><span class="piece em-dot">.</span></h1>
+    <p class="sub piece"><span class="more">and so much more…</span><span class="sep">·</span><span class="jp">自分の機械で動く</span></p>
+    <div class="slash piece"></div>
+    <p class="stance piece">private · invite-only · source at release</p>
+    <a class="action piece" href="mailto:ikari@ayamai.io?subject=ayamai%20%E2%80%94%20private%20beta">sign up for the private beta</a>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>ayamaiio · ikari</span>
+  <span>v{{VERSION}}</span>
+</footer>
+
+</body>
+</html>

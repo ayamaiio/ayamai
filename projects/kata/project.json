@@ -1,0 +1,33 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "kata",
+  "name": "kata",
+  "version": "2026.11.02.8",
+  "description": "The design library: tokens, components, and the editor that writes them.",
+  "routes": [
+    {
+      "prefix": "/kata",
+      "service": "app"
+    }
+  ],
+  "services": [
+    {
+      "id": "app",
+      "name": "kata",
+      "port": 4600,
+      "health": "/kata/",
+      "start": {
+        "command": "node",
+        "args": [
+          "projects/kata/index.mjs"
+        ],
+        "env": {
+          "BASE_PREFIX": "/kata"
+        }
+      }
+    }
+  ],
+  "requires": [
+    "node>=20"
+  ]
+}

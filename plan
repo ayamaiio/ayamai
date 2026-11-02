@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Pinned to this project so the plan store follows the repo, not the cwd.
+here="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+export PLAN_DIR="${PLAN_DIR:-$here/.plan}"
+node24="$HOME/.nvm/versions/node/v24.11.0/bin"
+[ -d "$node24" ] && PATH="$node24:$PATH"
+exec node "$here/scripts/plan.mjs" "$@"

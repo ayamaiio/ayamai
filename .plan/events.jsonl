@@ -1,0 +1,69 @@
+{"t":"add","id":1,"ts":"2026-11-01T03:02:06.911Z","title":"Local import registers as a first-class job","body":"Importer writes to media_items but never creates a job, so the app cannot see it. Per-file rows vs aggregate counters is the open decision.","project":"box","priority":1,"labels":[]}
+{"t":"add","id":2,"ts":"2026-11-01T03:02:06.945Z","title":"Second copy of the vault","body":"385 GB of irreplaceable media on a single SSD. No cloud copy by design. Needs a durability story.","project":"box","priority":1,"labels":[]}
+{"t":"add","id":3,"ts":"2026-11-01T03:02:06.984Z","title":"Verify the library works with the network unplugged","body":"Local-founder mode, filesystem media, local Postgres. Claimed offline; not yet proven end to end.","project":"box","priority":1,"labels":[]}
+{"t":"add","id":4,"ts":"2026-11-01T03:02:07.024Z","title":"ayamai CLI: import, status, verify","body":"Terminal is the first-class interface. The web app shrinks to viewing images, playing video, seeking.","project":"box","priority":2,"labels":[]}
+{"t":"add","id":5,"ts":"2026-11-01T03:02:07.067Z","title":"Video preview backfill","body":"Previews are generated on demand and nothing enqueues them for imported rows. ~2,300 videos need a backfill.","project":"library","priority":2,"labels":[]}
+{"t":"add","id":6,"ts":"2026-11-01T03:02:07.114Z","title":"Activity covers previews and labels, not just imports","body":"The status line assumes every job is an import. It should report preview generation and label sync too.","project":"box","priority":3,"labels":[]}
+{"t":"add","id":7,"ts":"2026-11-01T03:02:07.153Z","title":"Decide: one box, or boxes that talk","body":"Invites, follows and feeds only make sense if boxes are networked. Everything downstream depends on this.","project":"product","priority":3,"labels":[]}
+{"t":"set","id":3,"ts":"2026-11-01T03:02:13.083Z","fields":{"status":"doing"}}
+{"t":"add","id":8,"ts":"2026-11-01T03:05:05.628Z","title":"Quoting check: spaces survive","body":"","project":"scratch","priority":4,"labels":[]}
+{"t":"rm","id":8,"ts":"2026-11-01T03:05:06.463Z"}
+{"t":"add","id":8,"ts":"2026-11-01T03:06:05.921Z","title":"Something we decided -","body":"","project":"box","priority":3,"labels":[]}
+{"t":"rm","id":8,"ts":"2026-11-01T03:38:09.908Z"}
+{"t":"set","id":1,"ts":"2026-11-01T03:40:38.447Z","fields":{"files":["scripts/import-local-dir.mjs"]}}
+{"t":"set","id":6,"ts":"2026-11-01T03:40:38.499Z","fields":{"files":["artifacts/api-server/src/routes/activity.ts","artifacts/api-server/src/routes/index.ts","artifacts/private-media-library/src/components/activity-line.tsx","artifacts/private-media-library/src/App.tsx","scripts/publish-activity.mjs"]}}
+{"t":"set","id":4,"ts":"2026-11-01T03:40:38.552Z","fields":{"files":["scripts/status","scripts/where"]}}
+{"t":"add","id":8,"ts":"2026-11-01T05:21:28.986Z","title":"Get started on a Game Boy emulator","body":"Captured 2026-11-01 from /home/markfoster314/ayamai-deepseek.\n\nGet started on a Game Boy emulator","project":"gb","priority":2,"labels":[],"files":[]}
+{"t":"add","id":9,"ts":"2026-11-01T05:21:29.056Z","title":"Make an intake system where my requests are marked down to revisit and turn into","body":"Captured 2026-11-01 from /home/markfoster314/ayamai-deepseek.\n\nMake an intake system where my requests are marked down to revisit and turn into actionable implementations","project":"tooling","priority":3,"labels":[],"files":[]}
+{"t":"set","id":9,"ts":"2026-11-01T05:21:29.100Z","fields":{"status":"done"}}
+{"t":"set","id":8,"ts":"2026-11-01T05:51:29.716Z","fields":{"status":"done"}}
+{"t":"set","id":5,"ts":"2026-11-01T06:15:19.324Z","fields":{"status":"doing"}}
+{"t":"add","id":10,"ts":"2026-11-01T08:11:22.823Z","title":"Decide: fork Chromium, wrap it in Electron, or stay on the extension","body":"","project":"product","priority":2,"labels":[],"files":[]}
+{"t":"add","id":11,"ts":"2026-11-01T08:11:22.865Z","title":"Inbox view: everything captured, grouped by post, ready to label","body":"","project":"library","priority":2,"labels":[],"files":[]}
+{"t":"add","id":12,"ts":"2026-11-01T08:37:15.979Z","title":"Capture panel: an in-page ayamai overlay with actions, not a floating badge","body":"","project":"product","priority":1,"labels":[],"files":[]}
+{"t":"add","id":13,"ts":"2026-11-01T09:13:14.447Z","title":"Gallery posts: page through the 30 attachments inside the loop","body":"","project":"product","priority":2,"labels":[],"files":[]}
+{"t":"add","id":14,"ts":"2026-11-01T23:40:50.539Z","title":"seiri smoke test","body":"","project":"ayamai","priority":4,"labels":[],"files":[]}
+{"t":"add","id":15,"ts":"2026-11-02T00:31:32.484Z","title":"Install ayamai on the TV in the living room","body":"Same shape as the Mac install: one privileged step, door on 80, autostart at login/boot. TVs have no shell — the realistic path is the LAN door (:25223) opened in the browser, or a Raspberry Pi / Apple TV app if that proves too limited. Decide which before building.","project":"ayamai","priority":3,"labels":[],"files":[]}
+{"t":"add","id":16,"ts":"2026-11-02T00:31:32.521Z","title":"Install ayamai on the game consoles","body":"PS5 and Xbox have no user shell and no browser worth using; Switch has neither. Realistic: a console browser pointing at the LAN door for the media surfaces, not the platform. Record what each console's browser actually supports before promising anything.","project":"ayamai","priority":4,"labels":[],"files":[]}
+{"t":"add","id":17,"ts":"2026-11-02T00:31:32.556Z","title":"Device install matrix: mac minis, laptops, Linux boxes, phones","body":"One checklist per class of machine, each with the evidence that it works: node source (tarball vs brew vs distro), hosts entry, port 80 mechanism (launchd / systemd / netsh portproxy), autostart, doctor output. The Mac laptop is done; a second Mac and a fresh Linux box are next.","project":"ayamai","priority":2,"labels":[],"files":[]}
+{"t":"rm","id":14,"ts":"2026-11-02T00:31:36.408Z"}
+{"t":"set","id":1,"ts":"2026-11-02T00:54:39.416Z","fields":{"assignee":"tester","leaseUntil":1793580880416,"status":"doing"}}
+{"t":"set","id":15,"ts":"2026-11-02T00:54:39.484Z","fields":{"assignee":null,"leaseUntil":null}}
+{"t":"set","id":1,"ts":"2026-11-02T00:57:43.803Z","fields":{"assignee":"claude","leaseUntil":1793582863803,"status":"doing"}}
+{"t":"set","id":1,"ts":"2026-11-02T00:57:43.843Z","fields":{"assignee":null,"leaseUntil":null}}
+{"t":"set","id":1,"ts":"2026-11-02T01:19:06.975Z","fields":{"project":"yoru"}}
+{"t":"set","id":3,"ts":"2026-11-02T01:19:07.011Z","fields":{"project":"yoru"}}
+{"t":"set","id":5,"ts":"2026-11-02T01:19:07.044Z","fields":{"project":"yoru"}}
+{"t":"set","id":2,"ts":"2026-11-02T01:19:07.076Z","fields":{"project":"yoru"}}
+{"t":"set","id":12,"ts":"2026-11-02T01:19:07.110Z","fields":{"project":"yoru"}}
+{"t":"set","id":4,"ts":"2026-11-02T01:19:07.144Z","fields":{"project":"yoru"}}
+{"t":"set","id":10,"ts":"2026-11-02T01:19:07.175Z","fields":{"project":"yoru"}}
+{"t":"set","id":11,"ts":"2026-11-02T01:19:07.206Z","fields":{"project":"yoru"}}
+{"t":"set","id":13,"ts":"2026-11-02T01:19:07.237Z","fields":{"project":"yoru"}}
+{"t":"set","id":6,"ts":"2026-11-02T01:19:07.269Z","fields":{"project":"yoru"}}
+{"t":"set","id":7,"ts":"2026-11-02T01:19:07.300Z","fields":{"project":"yoru"}}
+{"t":"set","id":8,"ts":"2026-11-02T01:19:07.339Z","fields":{"project":"ayamai"}}
+{"t":"set","id":9,"ts":"2026-11-02T01:19:07.373Z","fields":{"project":"ayamai"}}
+{"t":"set","id":3,"ts":"2026-11-02T01:19:54.704Z","fields":{"assignee":"operator","leaseUntil":1793584194704,"status":"doing"}}
+{"t":"set","id":3,"ts":"2026-11-02T01:19:54.829Z","fields":{"assignee":null,"leaseUntil":null}}
+{"t":"set","id":3,"ts":"2026-11-02T01:20:14.451Z","fields":{"assignee":"operator","leaseUntil":1793584214450,"status":"doing"}}
+{"t":"set","id":3,"ts":"2026-11-02T01:21:04.313Z","fields":{"assignee":"operator","leaseUntil":1793584264312,"status":"doing"}}
+{"t":"set","id":3,"ts":"2026-11-02T01:22:29.522Z","fields":{"assignee":"operator","leaseUntil":1793584349522,"status":"doing"}}
+{"t":"set","id":3,"ts":"2026-11-02T01:24:03.551Z","fields":{"assignee":null,"leaseUntil":null}}
+{"t":"add","id":18,"ts":"2026-11-02T01:33:23.401Z","title":"Add a per-project activity signal endpoint that returns last-touched timestamp and open-work count","body":"from idea #1 · A way to see which projects are quiet and which are on fire, at a glance\n\nExpose a single read endpoint on the platform that, for each registered project, returns the most recent activity timestamp and the count of open items (uncommitted files, open plans, pending intake). Done when the endpoint returns data for all six projects and a contract test pins the response shape.","project":"ayamai","priority":1,"labels":["idea:1"],"files":[]}
+{"t":"add","id":19,"ts":"2026-11-02T01:33:23.434Z","title":"Define quiet and on-fire thresholds as configurable platform settings","body":"from idea #1 · A way to see which projects are quiet and which are on fire, at a glance\n\nAdd named settings for the quiet cutoff (no activity for N days) and the on-fire cutoff (open items above M or activity within H hours), with sane defaults and a documented precedence order. Done when the thresholds can be changed without a code deploy and the signal endpoint reflects the new values.","project":"ayamai","priority":2,"labels":["idea:1"],"files":[]}
+{"t":"add","id":20,"ts":"2026-11-02T01:34:14.780Z","title":"probe story","body":"from idea #2 · probe\n\nb","project":"hisho","priority":2,"labels":["idea:2"],"files":[]}
+{"t":"add","id":21,"ts":"2026-11-02T01:34:21.042Z","title":"gehirn probe","body":"from idea #3 · probe three\n\nx","project":"gehirn","priority":3,"labels":["idea:3"],"files":[]}
+{"t":"rm","id":20,"ts":"2026-11-02T01:34:29.310Z"}
+{"t":"rm","id":21,"ts":"2026-11-02T01:34:29.342Z"}
+{"t":"set","id":18,"ts":"2026-11-02T01:34:29.377Z","fields":{"project":"hisho"}}
+{"t":"set","id":19,"ts":"2026-11-02T01:34:29.409Z","fields":{"project":"hisho"}}
+{"t":"set","id":2,"ts":"2026-11-02T01:38:01.303Z","fields":{"status":"done"}}
+{"t":"set","id":2,"ts":"2026-11-02T01:38:01.723Z","fields":{"status":"blocked"}}
+{"t":"set","id":1,"ts":"2026-11-02T01:38:03.070Z","fields":{"status":"blocked"}}
+{"t":"set","id":1,"ts":"2026-11-02T01:38:11.590Z","fields":{"status":"done"}}
+{"t":"set","id":17,"ts":"2026-11-02T01:48:02.864Z","fields":{"project":"platform"}}
+{"t":"set","id":15,"ts":"2026-11-02T01:48:02.897Z","fields":{"project":"platform"}}
+{"t":"set","id":16,"ts":"2026-11-02T01:48:02.930Z","fields":{"project":"platform"}}
+{"t":"set","id":8,"ts":"2026-11-02T01:48:02.965Z","fields":{"project":"platform"}}
+{"t":"set","id":9,"ts":"2026-11-02T01:48:02.998Z","fields":{"project":"platform"}}

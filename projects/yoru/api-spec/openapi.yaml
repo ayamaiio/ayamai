@@ -1,0 +1,2067 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: media
+    description: Private media library operations.
+  - name: storage
+    description: Direct-to-R2 upload URL operations.
+paths:
+  /capture/uploads:
+    post:
+      operationId: requestCaptureUpload
+      description: Account-bound desktop capture. Per-account SHA-256 deduplication; 20 MiB maximum. Bytes are verified before ordinary media creation.
+      parameters:
+        - name: X-Capture-Account
+          in: header
+          required: true
+          schema: { type: string, minLength: 1 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaptureUploadInput"
+      responses:
+        "200":
+          description: Private direct upload target. Ordinary media creation serializes deduplication by account and content hash.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [uploadUrl, objectKey]
+                properties:
+                  uploadUrl: { type: string }
+                  objectKey: { type: string }
+        "400": { description: Invalid capture metadata }
+        "409": { description: Account changed }
+        "429": { description: Capture budget exhausted }
+  /edge/media-authorize:
+    post:
+      operationId: authorizeEdgeMedia
+      description: Internal edge service only. Service bearer credential plus encrypted viewer ticket required. Never call from a browser.
+      parameters:
+        - name: X-Edge-Authorization
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EdgeMediaCredential" }
+      responses:
+        "200":
+          description: Internal storage locator. Never forward to the browser or cache.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EdgeMediaGrant" }
+        "404": { description: Invalid credential or no longer eligible }
+        "429":
+          description: Viewer authorization budget exhausted; no grant issued
+          headers:
+            Retry-After:
+              schema: { type: string, enum: ["1"] }
+              description: Wait at least one second before a new request
+        "503":
+          description: Authorization unavailable or service budget exhausted; fail closed
+          headers:
+            Retry-After:
+              schema: { type: string, enum: ["1"] }
+              description: Present on admission overload and database unavailability
+  /imports/accounts:
+    get:
+      operationId: listCloudAccounts
+      responses:
+        "200":
+          description: Connection status only; never credentials
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CloudAccount" }
+  /imports/accounts/{provider}/authorize:
+    post:
+      operationId: authorizeCloudAccount
+      parameters:
+        - $ref: "#/components/parameters/CloudProviderParam"
+      responses:
+        "200":
+          description: Authorization URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudAuthorization"
+  /imports/accounts/{provider}/callback:
+    get:
+      operationId: finishCloudAuthorization
+      parameters:
+        - $ref: "#/components/parameters/CloudProviderParam"
+        - { name: state, in: query, schema: { type: string, maxLength: 200 } }
+        - { name: code, in: query, schema: { type: string, maxLength: 4096 } }
+        - { name: error, in: query, schema: { type: string, maxLength: 200 } }
+      responses:
+        "200": { description: Safe authorization result page }
+  /imports/accounts/{provider}:
+    delete:
+      operationId: disconnectCloudAccount
+      parameters:
+        - $ref: "#/components/parameters/CloudProviderParam"
+      responses:
+        "204": { description: Credentials removed and pending imports stopped }
+  /imports/accounts/{provider}/entries:
+    get:
+      operationId: browseCloudEntries
+      parameters:
+        - $ref: "#/components/parameters/CloudProviderParam"
+        - { name: folder, in: query, schema: { type: string, maxLength: 1024 } }
+        - { name: cursor, in: query, schema: { type: string, maxLength: 8192 } }
+      responses:
+        "200":
+          description: One page of folders and media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudEntriesPage"
+  /imports/accounts/{provider}/preview:
+    post:
+      operationId: previewCloudSelection
+      parameters:
+        - $ref: "#/components/parameters/CloudProviderParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloudSelectionInput"
+      responses:
+        "201":
+          description: Durable preview including folder descendants
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportJob"
+  /access/me:
+    get:
+      operationId: getAccessMe
+      tags: [access]
+      description: Current application membership. Only an owner sees invitation and member details.
+      responses:
+        "200":
+          description: Membership and owner-only capacity details.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AccessSnapshot" }
+        "401": { description: Sign-in required. }
+  /access/invites/validate:
+    post:
+      operationId: validateAccessInvite
+      tags: [access]
+      description: Validate an invitation token without consuming it. Token is sent in the body, not a URL.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AccessInviteTokenInput" }
+      responses:
+        "200":
+          description: Invitation validity and bound email, if valid.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AccessInviteValidation" }
+        "429": { description: Validation limit reached. }
+  /access/invites/accept:
+    post:
+      operationId: acceptAccessInvite
+      tags: [access]
+      description: Accept an email-bound invitation after sign-in with a verified matching email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AccessInviteTokenInput" }
+      responses:
+        "200":
+          description: Active membership and owner-only capacity details.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AccessSnapshot" }
+        "401": { description: Sign-in required. }
+        "403": { description: Invitation email does not match a verified account email. }
+        "409": { description: Invitation was already used or capacity is full. }
+  /access/invites:
+    post:
+      operationId: createAccessInvite
+      tags: [access]
+      description: Owner-only; creates a one-use invitation link bound to one email address.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AccessInviteInput" }
+      responses:
+        "201":
+          description: Invitation link. The token is returned once and is not stored in plaintext.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AccessInviteCreated" }
+        "403": { description: Owner access required. }
+        "409": { description: No invite slots remain or email is already active/invited. }
+  /access/invites/{id}:
+    delete:
+      operationId: revokeAccessInvite
+      tags: [access]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "204": { description: Pending invitation revoked. }
+        "403": { description: Owner access required. }
+        "404": { description: Invitation not found. }
+  /access/members/{userId}:
+    delete:
+      operationId: revokeAccessMember
+      tags: [access]
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: string, minLength: 1, maxLength: 256 } }
+      responses:
+        "204": { description: Member access revoked. }
+        "403": { description: Owner access required. }
+        "404": { description: Active member not found. }
+  /social/me:
+    get:
+      operationId: getSocialAccount
+      tags: [social]
+      responses:
+        "200":
+          description: Account preferences and chosen profile, never Clerk identity.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialAccount" }
+    patch:
+      operationId: updateSocialAccount
+      tags: [social]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SocialAccountInput" }
+      responses:
+        "200":
+          description: Updated account.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialAccount" }
+  /social/profile:
+    put:
+      operationId: updateSocialProfile
+      tags: [social]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SocialProfileInput" }
+      responses:
+        "200":
+          description: Chosen pseudonymous profile.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialProfile" }
+  /social/profiles/{id}:
+    get:
+      operationId: getSocialProfile
+      tags: [social]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+      responses:
+        "200":
+          description: Named public posts only, without anonymous-post linkage.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialProfilePage" }
+  /social/label-queue:
+    get:
+      operationId: getLabelQueue
+      tags: [social]
+      summary: Private accessible-media review queue in stable media-ID order
+      parameters:
+        - { in: query, name: status, schema: { type: string, enum: [all, unlabeled, draft, reviewed], default: all } }
+        - { in: query, name: tag, schema: { type: string, maxLength: 80 } }
+        - { in: query, name: cursor, schema: { type: string, maxLength: 1000 } }
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 100, default: 30 } }
+      responses:
+        "200":
+          description: One bounded queue page; cursor binds filters and creation cutoff
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LabelQueuePage" }
+  /social/label-exports:
+    get:
+      operationId: listLabelExports
+      tags: [social]
+      responses:
+        "200":
+          description: Caller's latest twenty unexpired export manifests
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: "#/components/schemas/LabelExportManifest" } }
+    post:
+      operationId: createLabelExport
+      tags: [social]
+      summary: Freeze current labels and separate safe revision audit at one database snapshot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                status: { type: string, enum: [all, draft, reviewed], default: reviewed }
+                tag: { type: string, maxLength: 80 }
+      responses:
+        "201":
+          description: Versioned manifest; download pages separately
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LabelExportManifest" }
+  /social/label-exports/{id}/rows:
+    get:
+      operationId: getLabelExportRows
+      tags: [social]
+      summary: Bounded resumable JSONL part with live access checks
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
+        - { in: query, name: cursor, schema: { type: integer, minimum: 0, default: 0 } }
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 100, default: 100 } }
+      responses:
+        "200":
+          description: Concatenate JSONL parts in cursor order; access-revoked rows are omitted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [jsonl, nextCursor, done]
+                properties:
+                  jsonl: { type: string }
+                  nextCursor: { type: integer }
+                  done: { type: boolean }
+  /social/posts/{id}/annotation:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getPostAnnotation
+      tags: [social]
+      summary: Get only the signed-in viewer's private labels and notes
+      responses:
+        "200":
+          description: Private annotation, or empty revision zero
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PostAnnotation" }
+    put:
+      operationId: updatePostAnnotation
+      tags: [social]
+      summary: Replace personal annotation with optimistic revision protection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PostAnnotationInput" }
+      responses:
+        "200":
+          description: Saved private annotation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PostAnnotation" }
+        "409":
+          description: Annotation changed elsewhere; reload before saving again
+  /social/labels:
+    get:
+      operationId: getLabelCatalog
+      tags: [social]
+      parameters:
+        - { name: prefix, in: query, schema: { type: string, maxLength: 80 } }
+      responses:
+        "200":
+          description: Suggestions from accessible post tags and the viewer's own annotations
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required: [tag, count]
+                      properties:
+                        tag: { type: string }
+                        count: { type: integer }
+  /social/videos:
+    get:
+      operationId: getVideoCollection
+      tags: [social]
+      parameters:
+        - { name: source, in: query, schema: { type: string, enum: [all, mine, saved], default: all } }
+        - { name: cursor, in: query, schema: { type: string, maxLength: 500 } }
+      responses:
+        "200":
+          description: Accessible videos, longest first, including unknown-duration videos last.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VideoCollectionPage" }
+  /social/profiles/{id}/follow:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getCreatorFollow
+      tags: [social]
+      responses:
+        "200":
+          description: Current viewer relationship and visible follower count.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreatorFollow" }
+    put:
+      operationId: setCreatorFollow
+      tags: [social]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatorFollowInput" }
+      responses:
+        "200":
+          description: Updated relationship. Following never grants private-media access.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreatorFollow" }
+  /social/following:
+    get:
+      operationId: getFollowedCreators
+      tags: [social]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: The caller's followed profiles, excluding blocks.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FollowedCreatorsPage" }
+  /social/posts/{id}/reviews:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getVideoReviews
+      tags: [social]
+      parameters:
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, maximum: 10000, default: 0 } }
+      responses:
+        "200":
+          description: Own review plus permitted reviews. Followers must also have media access. Anonymous posts do not expose their owner through follower permissions.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VideoReviewsPage" }
+    put:
+      operationId: setVideoReview
+      tags: [social]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VideoReviewInput" }
+      responses:
+        "200":
+          description: Saved own review with optimistic concurrency protection.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VideoReview" }
+        "409":
+          description: Review changed elsewhere. Keep the draft and reload before saving again.
+    delete:
+      operationId: deleteVideoReview
+      tags: [social]
+      parameters:
+        - { name: expectedRevision, in: query, required: true, schema: { type: integer, minimum: 1 } }
+        - { name: reviewId, in: query, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "204":
+          description: Own review removed.
+        "409":
+          description: Review changed elsewhere.
+  /social/saved:
+    get:
+      operationId: getSavedSocialPosts
+      tags: [social]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: type, in: query, schema: { type: string, enum: [all, image, video], default: all } }
+      responses:
+        "200":
+          description: Private saved collection, including owned favorites. Eligibility is checked on every request; ordered by descending post ID.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SavedSocialPostsPage" }
+        "400":
+          description: Invalid cursor or filter.
+        "401":
+          description: Sign in required.
+        "403":
+          description: Adult confirmation required.
+  /social/feed:
+    get:
+      operationId: getSocialFeed
+      tags: [social]
+      parameters:
+        - { name: sessionId, in: query, required: true, schema: { type: string, format: uuid } }
+        - { name: lane, in: query, schema: { type: string, enum: [for-you, collection], default: for-you } }
+        - { name: hashtag, in: query, schema: { type: string, maxLength: 80 } }
+        - { name: lengthPreference, in: query, schema: { type: string, enum: [balanced, short, long], default: balanced } }
+        - { name: type, in: query, schema: { type: string, enum: [all, image, video], default: all } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+      responses:
+        "200":
+          description: Stable personalized cycle with eligibility rechecked on each page.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialFeedPage" }
+  /media/{id}/playback-bookmark/{viewerId}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: viewerId, in: path, required: true, schema: { type: string, minLength: 1 } }
+    get:
+      operationId: getPlaybackBookmark
+      tags: [media]
+      responses:
+        "200":
+          description: Private viewer bookmark, or legacy owner progress when no bookmark exists. Access is checked afresh.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlaybackBookmark" }
+        "401": { description: Sign in required }
+        "403": { description: Viewer or membership mismatch }
+        "404": { description: Video unavailable }
+    put:
+      operationId: setPlaybackBookmark
+      tags: [media]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlaybackBookmarkInput" }
+      responses:
+        "200":
+          description: Saved for the authenticated viewer only.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlaybackBookmark" }
+        "400": { description: Invalid position }
+        "401": { description: Sign in required }
+        "403": { description: Viewer or membership mismatch }
+        "404": { description: Video unavailable }
+  /social/posts/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSocialPost
+      tags: [social]
+      responses:
+        "200":
+          description: Accessible post; anonymous authors cannot be identified.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialPost" }
+    patch:
+      operationId: updateSocialPost
+      tags: [social]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PostInput" }
+      responses:
+        "200":
+          description: Explicitly published or updated owned post.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialPost" }
+  /social/posts/{id}/action:
+    post:
+      operationId: actOnSocialPost
+      tags: [social]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PostActionInput" }
+      responses:
+        "200":
+          description: Updated post, or null after blocking.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [post]
+                properties:
+                  post:
+                    anyOf:
+                      - { $ref: "#/components/schemas/SocialPost" }
+                      - { type: "null" }
+  /social/posts/{id}/events:
+    post:
+      operationId: recordSocialEvent
+      tags: [social]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SocialEventInput" }
+      responses:
+        "200":
+          description: Idempotently accepted bounded foreground telemetry.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [accepted]
+                properties:
+                  accepted: { type: boolean }
+                  viewCount: { type: integer, minimum: 0 }
+                  viewCountVisibility: { type: string, enum: [public, private] }
+  /social/posts/{id}/comments:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSocialComments
+      tags: [social]
+      parameters:
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+      responses:
+        "200":
+          description: Plain text anonymous comments filtered for blocked accounts.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialCommentsPage" }
+    post:
+      operationId: createSocialComment
+      tags: [social]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SocialCommentInput" }
+      responses:
+        "201":
+          description: Comment created once per request ID.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialComment" }
+  /social/comments/{id}:
+    delete:
+      operationId: deleteSocialComment
+      tags: [social]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "204": { description: Own comment or comment on owned post removed. }
+  /social/moderation:
+    get:
+      operationId: getSocialModeration
+      tags: [social]
+      responses:
+        "200":
+          description: Authorized moderation queue.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ModerationQueue" }
+  /social/moderation/{id}:
+    post:
+      operationId: moderateSocialReport
+      tags: [social]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [remove, dismiss] }
+      responses:
+        "204": { description: Report reviewed and visibility enforced. }
+  /imports:
+    get:
+      operationId: listImportJobs
+      tags: [media]
+      summary: List recent cloud imports for the signed-in account
+      responses:
+        "200":
+          description: Recent jobs including persistent per-file progress.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ImportJobList" }
+  /imports/preview:
+    post:
+      operationId: previewImportLink
+      tags: [media]
+      summary: Inspect an accessible cloud share link without importing it
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ImportLinkInput" }
+      responses:
+        "201":
+          description: Private preview ready for explicit file selection.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ImportJob" }
+  /imports/{id}/start:
+    post:
+      operationId: startImportJob
+      tags: [media]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ImportSelectionInput" }
+      responses:
+        "200":
+          description: Confirmed import queued.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ImportJob" }
+  /imports/{id}/action:
+    post:
+      operationId: actOnImportJob
+      tags: [media]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ImportActionInput" }
+      responses:
+        "200":
+          description: Updated job.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ImportJob" }
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /media/posts:
+    post:
+      operationId: createGalleryPost
+      tags: [media]
+      summary: Atomically create one post containing ordered images or GIFs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GalleryPostInput"
+      responses:
+        "201":
+          description: The entire post was recorded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaAsset"
+        "400":
+          description: Invalid images or post metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "409":
+          description: Conflicting submission or previously used upload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /media/{id}/attachments/{attachmentId}/view-url:
+    get:
+      operationId: getGalleryAttachmentViewUrl
+      tags: [media]
+      summary: Get an authorized short-lived URL for an image in a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: attachmentId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Temporary viewing URL.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaViewUrl"
+        "404":
+          description: Post or attachment unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /media:
+    get:
+      operationId: listMedia
+      tags: [media]
+      summary: List the signed-in user's media
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [all, image, video]
+            default: all
+        - name: favorites
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: collection
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 80
+        - name: uncategorized
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 60
+            default: 30
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: anchorId
+          in: query
+          required: false
+          description: Open a window near this matching media item; missing or inaccessible anchors start at zero.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Matching private media items.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaListResponse"
+    post:
+      operationId: createMedia
+      tags: [media]
+      summary: Register a completed upload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMediaInput"
+      responses:
+        "201":
+          description: Media item registered.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaAsset"
+        "400":
+          description: Invalid metadata or upload key.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /watch/feed:
+    get:
+      operationId: getWatchFeed
+      tags: [media]
+      summary: Get a private stable Watch feed page
+      parameters:
+        - name: sessionId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 60, default: 24 }
+        - name: offset
+          in: query
+          required: false
+          schema: { type: integer, minimum: 0, default: 0 }
+      responses:
+        "200":
+          description: A page from this account's stable randomized feed cycle.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WatchFeedResponse"
+        "400":
+          description: Invalid feed pagination or session identifier.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "409":
+          description: Feed session is already associated with another account.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /watch/settings:
+    get:
+      operationId: getWatchSettings
+      tags: [media]
+      summary: Get private Watch behavior settings
+      responses:
+        "200":
+          description: Settings for the signed-in account.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WatchSettings"
+    patch:
+      operationId: updateWatchSettings
+      tags: [media]
+      summary: Update private Watch behavior settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WatchSettingsUpdate"
+      responses:
+        "200":
+          description: Updated Watch settings.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WatchSettings"
+  /watch/history:
+    delete:
+      operationId: clearWatchHistory
+      tags: [media]
+      summary: Clear inferred Watch behavior while keeping reactions
+      responses:
+        "204":
+          description: Viewing behavior history cleared.
+  /watch/media/{id}/reaction:
+    get:
+      operationId: getWatchReaction
+      tags: [media]
+      summary: Get the saved reaction and like count for an owned media item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Reaction and actual like count. Private items currently accept only their owner's reaction.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WatchReaction"
+        "404":
+          description: Media item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+    patch:
+      operationId: setWatchReaction
+      tags: [media]
+      summary: Set or clear an explicit Watch reaction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WatchReactionInput"
+      responses:
+        "200":
+          description: Explicit reaction for the private media item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WatchReaction"
+        "404":
+          description: Media item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /watch/media/{id}/event:
+    post:
+      operationId: recordWatchEvent
+      tags: [media]
+      summary: Record a minimal private viewing signal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WatchEventInput"
+      responses:
+        "200":
+          description: Updated per-account viewing summary.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WatchSignalSummary"
+        "404":
+          description: Media item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /media/collections:
+    get:
+      operationId: listMediaCollections
+      tags: [media]
+      summary: List the signed-in user's collections
+      responses:
+        "200":
+          description: Collection names in the signed-in user's library.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaCollectionsResponse"
+  /media/summary:
+    get:
+      operationId: getMediaSummary
+      tags: [media]
+      summary: Get private library totals
+      responses:
+        "200":
+          description: Summary totals for the signed-in user's library.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaSummary"
+  /media/{id}:
+    patch:
+      operationId: updateMedia
+      tags: [media]
+      summary: Update a media title, favorite, or playback position
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMediaInput"
+      responses:
+        "200":
+          description: Updated media item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaAsset"
+        "404":
+          description: Media item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+    delete:
+      operationId: deleteMedia
+      tags: [media]
+      summary: Delete a media item and its private object
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Media item deleted.
+        "404":
+          description: Media item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /media/{id}/preview:
+    get:
+      operationId: getMediaPreview
+      tags: [media]
+      summary: Get a bounded static tile preview, generating missing previews on demand
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Ready preview or explicit pending/unavailable state. Never falls back to the original.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaPreview"
+        "404":
+          description: Media is missing or inaccessible.
+    post:
+      operationId: regenerateMediaPreview
+      tags: [media]
+      summary: Owner-only safe preview regeneration
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "202":
+          description: Regeneration queued; the existing preview is preserved until replacement succeeds.
+        "404":
+          description: Media is missing or not owned by this account.
+        "429":
+          description: Regeneration queue is full or rate limit exceeded.
+  /media/{id}/preview/image:
+    get:
+      operationId: streamMediaPreview
+      tags: [media]
+      summary: Serve a protected JPEG preview using an opaque short-lived ticket and current access checks
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: ticket, in: query, required: true, schema: { type: string, maxLength: 2048 } }
+      responses:
+        "200":
+          description: Bounded static JPEG preview.
+          content:
+            image/jpeg:
+              schema: { type: string, format: binary }
+        "404":
+          description: Ticket expired, preview missing, or media inaccessible.
+  /media/{id}/view-url:
+    get:
+      operationId: getMediaViewUrl
+      tags: [media]
+      summary: Get a short-lived private viewing URL
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Temporary URL for the requested media item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaViewUrl"
+        "404":
+          description: Media item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /storage/uploads/request-url:
+    post:
+      operationId: requestMediaUploadUrl
+      tags: [storage]
+      summary: Create a short-lived private R2 upload URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlInput"
+      responses:
+        "200":
+          description: Upload URL and private object key.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResult"
+        "400":
+          description: Invalid file metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /membership:
+    get:
+      operationId: getMembership
+      tags: [membership]
+      responses:
+        "200":
+          description: Current authenticated identity's membership, without referral identities.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MembershipStatus" }
+  /membership/redeem:
+    post:
+      operationId: redeemMembership
+      tags: [membership]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MembershipRedemption" }
+      responses:
+        "200":
+          description: Membership accepted.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MembershipStatus" }
+  /membership/invitations:
+    get:
+      operationId: getMembershipInvitations
+      tags: [membership]
+      responses:
+        "200":
+          description: Own invitations, with no bearer codes or invitee identities.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InvitationSummary" }
+    post:
+      operationId: createMembershipInvitation
+      tags: [membership]
+      responses:
+        "201":
+          description: Invitation bearer token returned once. Never expires; single use.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InvitationSecret" }
+  /membership/invitations/{id}:
+    delete:
+      operationId: revokeMembershipInvitation
+      tags: [membership]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "204": { description: Own unused invitation revoked. }
+  /membership/referrals:
+    get:
+      operationId: getMembershipReferrals
+      tags: [membership]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, maxLength: 128 } }
+      responses:
+        "200":
+          description: Operator-authorized, paginated internal account relationships.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReferralPage" }
+components:
+  parameters:
+    CloudProviderParam:
+      name: provider
+      in: path
+      required: true
+      schema: { type: string, enum: [drive, dropbox] }
+  schemas:
+    PlaybackBookmark:
+      type: object
+      required: [seconds]
+      properties:
+        seconds: { type: ["number", "null"], minimum: 0 }
+    PlaybackBookmarkInput:
+      type: object
+      required: [seconds]
+      properties:
+        seconds: { type: number, minimum: 0, maximum: 31536000 }
+    MembershipStatus:
+      type: object
+      required: [member, isOperator]
+      properties:
+        member: { type: boolean }
+        isOperator: { type: boolean }
+    MembershipRedemption:
+      type: object
+      additionalProperties: false
+      required: [token, relationshipAcknowledged]
+      properties:
+        token: { type: string, pattern: "^[A-Za-z0-9_-]{43}$" }
+        relationshipAcknowledged: { type: boolean, enum: [true] }
+    InvitationSecret:
+      type: object
+      required: [id, token]
+      properties:
+        id: { type: string, format: uuid }
+        token: { type: string }
+    InvitationSummary:
+      type: object
+      required: [limit, successful, available, invitations]
+      properties:
+        limit: { type: integer }
+        successful: { type: integer }
+        available: { type: integer }
+        invitations:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            required: [id, createdAt, status]
+            properties:
+              id: { type: string, format: uuid }
+              createdAt: { type: string, format: date-time }
+              status: { type: string, enum: [unused, used, revoked] }
+    ReferralPage:
+      type: object
+      required: [relationships, nextCursor]
+      properties:
+        nextCursor: { type: string, nullable: true }
+        relationships:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            required: [inviterId, memberId, joinedAt]
+            properties:
+              inviterId: { type: string, nullable: true }
+              memberId: { type: string }
+              joinedAt: { type: string, format: date-time }
+    AccessInviteTokenInput:
+      type: object
+      additionalProperties: false
+      required: [token]
+      properties:
+        token: { type: string, minLength: 32, maxLength: 128, pattern: "^[A-Za-z0-9_-]+$" }
+    AccessInviteInput:
+      type: object
+      additionalProperties: false
+      required: [email]
+      properties:
+        email: { type: string, format: email, minLength: 3, maxLength: 254 }
+    AccessInviteValidation:
+      type: object
+      additionalProperties: false
+      required: [valid, email]
+      properties:
+        valid: { type: boolean }
+        email: { type: ["string", "null"], maxLength: 254 }
+    AccessInviteCreated:
+      type: object
+      additionalProperties: false
+      required: [id, email, invitePath, expiresAt]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        invitePath: { type: string, minLength: 1, maxLength: 256 }
+        expiresAt: { type: string, format: date-time }
+    AccessInvite:
+      type: object
+      additionalProperties: false
+      required: [id, email, status, createdAt, expiresAt]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        status: { type: string, enum: [pending, accepted, revoked, expired] }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+    AccessMember:
+      type: object
+      additionalProperties: false
+      required: [userId, email, createdAt]
+      properties:
+        userId: { type: string, minLength: 1, maxLength: 256 }
+        email: { type: string, format: email }
+        createdAt: { type: string, format: date-time }
+    AccessSnapshot:
+      type: object
+      additionalProperties: false
+      required: [membership, inviteSlotsUsed, inviteSlotsRemaining, invites, members]
+      properties:
+        membership:
+          anyOf:
+            - type: object
+              additionalProperties: false
+              required: [role]
+              properties:
+                role: { type: string, enum: [owner, member] }
+            - type: "null"
+        inviteSlotsUsed: { type: integer, minimum: 0, maximum: 5 }
+        inviteSlotsRemaining: { type: integer, minimum: 0, maximum: 5 }
+        invites:
+          type: array
+          items: { $ref: "#/components/schemas/AccessInvite" }
+        members:
+          type: array
+          items: { $ref: "#/components/schemas/AccessMember" }
+    CaptureUploadInput:
+      type: object
+      additionalProperties: false
+      required: [sha256, size, contentType]
+      properties:
+        sha256: { type: string, pattern: "^[a-f0-9]{64}$" }
+        size: { type: integer, minimum: 1, maximum: 20971520 }
+        contentType: { type: string, enum: [image/png, image/jpeg, image/gif, image/webp, image/avif, video/mp4, video/webm] }
+    EdgeMediaCredential:
+      type: object
+      required: [id, ticket]
+      properties:
+        id: { type: string, format: uuid }
+        ticket: { type: string, minLength: 1, maxLength: 2048 }
+    EdgeMediaGrant:
+      type: object
+      required: [objectKey, contentType]
+      properties:
+        objectKey: { type: string, minLength: 1 }
+        contentType: { type: string, minLength: 1 }
+    CloudAccount:
+      type: object
+      required: [provider, configured, connected]
+      properties:
+        provider: { type: string, enum: [drive, dropbox] }
+        configured: { type: boolean }
+        connected: { type: boolean }
+    CloudAuthorization:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string }
+    CloudEntry:
+      type: object
+      required: [id, name, folder, size]
+      properties:
+        id: { type: string, maxLength: 1024 }
+        name: { type: string }
+        folder: { type: boolean }
+        size: { type: integer }
+    CloudEntriesPage:
+      type: object
+      required: [entries, cursor]
+      properties:
+        entries:
+          type: array
+          items: { $ref: "#/components/schemas/CloudEntry" }
+        cursor: { type: ["string", "null"] }
+    CloudSelectionInput:
+      type: object
+      required: [ids]
+      properties:
+        ids:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items: { type: string, minLength: 1, maxLength: 1024 }
+    SocialProfileInput:
+      type: object
+      required: [handle, displayName, bio]
+      properties:
+        handle: { type: string, pattern: "^[a-z0-9_]{3,24}$" }
+        displayName: { type: string, minLength: 1, maxLength: 50 }
+        bio: { type: string, maxLength: 300 }
+    SocialProfile:
+      allOf:
+        - { $ref: "#/components/schemas/SocialProfileInput" }
+        - type: object
+          required: [id]
+          properties:
+            id: { type: string, format: uuid }
+    SocialAccount:
+      type: object
+      required: [adultAccepted, collaborativeConsent, isModerator, profile]
+      properties:
+        adultAccepted: { type: boolean }
+        collaborativeConsent: { type: boolean }
+        isModerator: { type: boolean }
+        profile:
+          anyOf:
+            - { $ref: "#/components/schemas/SocialProfile" }
+            - { type: "null" }
+    SocialAccountInput:
+      type: object
+      properties:
+        adultConfirmed: { type: boolean }
+        policyAccepted: { type: boolean }
+        collaborativeConsent: { type: boolean }
+    LabelQueuePage:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        nextCursor: { type: string, nullable: true }
+        items:
+          type: array
+          items:
+            type: object
+            required: [mediaId, title, mediaType, reviewStatus, revision]
+            properties:
+              mediaId: { type: string, format: uuid }
+              title: { type: string }
+              mediaType: { type: string }
+              reviewStatus: { type: string, enum: [unlabeled, draft, reviewed] }
+              revision: { type: integer }
+    LabelExportManifest:
+      type: object
+      required: [id, manifestVersion, schemaVersion, taxonomyVersion, snapshotAt, expiresAt, status, tag, recordCount, metadata]
+      properties:
+        id: { type: string, format: uuid }
+        manifestVersion: { type: integer }
+        schemaVersion: { type: integer }
+        taxonomyVersion: { type: integer }
+        snapshotAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        status: { type: string, enum: [all, draft, reviewed] }
+        tag: { type: string, nullable: true }
+        recordCount: { type: integer }
+        metadata: { type: object, additionalProperties: true }
+    PostAnnotationInput:
+      type: object
+      required: [expectedRevision, tags, attributes, notes, reviewStatus, confidence]
+      properties:
+        expectedRevision: { type: integer, minimum: 0 }
+        tags:
+          type: array
+          maxItems: 40
+          items: { type: string, minLength: 1, maxLength: 80 }
+        attributes:
+          type: object
+          maxProperties: 20
+          additionalProperties:
+            type: array
+            maxItems: 12
+            items: { type: string, minLength: 1, maxLength: 80 }
+        notes: { type: string, maxLength: 5000 }
+        reviewStatus: { type: string, enum: [draft, reviewed] }
+        confidence: { type: string, enum: [unsure, confident] }
+        sourceUrl: { type: [string, "null"], maxLength: 2000 }
+    PostAnnotation:
+      type: object
+      required: [mediaId, revision, schemaVersion, tags, attributes, notes, reviewStatus, confidence, sourceUrl, updatedAt]
+      properties:
+        mediaId: { type: string, format: uuid }
+        revision: { type: integer }
+        schemaVersion: { type: integer }
+        tags:
+          type: array
+          items: { type: string }
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+        notes: { type: string }
+        reviewStatus: { type: string, enum: [draft, reviewed] }
+        confidence: { type: string, enum: [unsure, confident] }
+        sourceUrl: { type: [string, "null"] }
+        updatedAt: { type: [string, "null"], format: date-time }
+    PostInput:
+      type: object
+      required: [visibility, attribution, description, tags, rightsConfirmed]
+      properties:
+        visibility: { type: string, enum: [public, private] }
+        attribution: { type: string, enum: [anonymous, profile] }
+        description: { type: string, maxLength: 2000 }
+        tags:
+          type: array
+          maxItems: 15
+          items: { type: string, minLength: 1, maxLength: 40 }
+        rightsConfirmed: { type: boolean }
+    SocialPost:
+      type: object
+      required: [id, mediaType, description, tags, visibility, attribution, profile, likeCount, commentCount, viewCount, reaction, isSaved, isOwner, createdAt, durationSeconds]
+      properties:
+        id: { type: string, format: uuid }
+        attachments:
+          type: array
+          description: Ordered images of this post, including its cover. Empty for videos. All interactions belong to the post ID.
+          items:
+            $ref: "#/components/schemas/PostAttachment"
+        mediaType: { type: string, enum: [image, video] }
+        description: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+        visibility: { type: string, enum: [public, private] }
+        attribution: { type: string, enum: [anonymous, profile] }
+        profile:
+          anyOf:
+            - { $ref: "#/components/schemas/SocialProfile" }
+            - { type: "null" }
+        likeCount: { type: integer }
+        viewCount: { type: integer, minimum: 0, description: "Qualifying video views, deduplicated per account and UTC day within the post visibility context." }
+        progressSeconds: { type: ["number", "null"], minimum: 0, description: "Owner's saved playback position; null for anyone else." }
+        commentCount: { type: integer }
+        reaction: { type: ["string", "null"], enum: [like, dislike, null] }
+        isSaved: { type: boolean }
+        isOwner: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        durationSeconds: { type: ["number", "null"] }
+    PostActionInput:
+      type: object
+      required: [action]
+      properties:
+        action: { type: string, enum: [like, dislike, clear-reaction, save, unsave, block, report] }
+        reason: { type: string, maxLength: 1000 }
+    SocialEventInput:
+      type: object
+      required: [eventId, event, watchSeconds]
+      properties:
+        eventId: { type: string, format: uuid }
+        event: { type: string, enum: [progress, dwell, complete, replay, quick-skip] }
+        watchSeconds: { type: number, minimum: 0, maximum: 30 }
+        durationSeconds: { type: number, minimum: 0.1, maximum: 43200 }
+    CreatorFollowInput:
+      type: object
+      required: [following]
+      properties:
+        following: { type: boolean }
+    CreatorFollow:
+      type: object
+      required: [following, followerCount, isOwnProfile]
+      properties:
+        following: { type: boolean }
+        followerCount: { type: integer }
+        isOwnProfile: { type: boolean }
+    FollowedCreatorsPage:
+      type: object
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/SocialProfile" }
+        nextCursor: { type: ["string", "null"], format: uuid }
+        hasMore: { type: boolean }
+    VideoCollectionPage:
+      type: object
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/SocialPost" }
+        nextCursor: { type: ["string", "null"] }
+        hasMore: { type: boolean }
+    VideoReviewInput:
+      type: object
+      required: [rating, text, expectedRevision, expectedReviewId]
+      properties:
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        text: { type: string, maxLength: 5000 }
+        expectedRevision: { type: integer, minimum: 0 }
+        expectedReviewId: { type: ["string", "null"], format: uuid }
+    VideoReview:
+      type: object
+      required: [id, rating, text, revision, isOwn, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        rating: { type: integer }
+        text: { type: string }
+        revision: { type: integer }
+        isOwn: { type: boolean }
+        updatedAt: { type: string, format: date-time }
+    VideoReviewsPage:
+      type: object
+      required: [ownReview, items, canReadOthers, count, averageRating, nextOffset, hasMore]
+      properties:
+        ownReview:
+          oneOf:
+            - { $ref: "#/components/schemas/VideoReview" }
+            - { type: "null" }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/VideoReview" }
+        canReadOthers: { type: boolean }
+        count: { type: integer }
+        averageRating: { type: ["number", "null"] }
+        nextOffset: { type: integer }
+        hasMore: { type: boolean }
+    SavedSocialPostsPage:
+      type: object
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/SocialPost" }
+        nextCursor: { type: ["string", "null"], format: uuid }
+        hasMore: { type: boolean }
+    SocialFeedPage:
+      type: object
+      required: [sessionId, items, offset, nextOffset, total, hasMore]
+      properties:
+        sessionId: { type: string, format: uuid }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/SocialPost" }
+        offset: { type: integer }
+        nextOffset: { type: integer }
+        total: { type: integer }
+        hasMore: { type: boolean }
+    SocialProfilePage:
+      type: object
+      required: [profile, posts, hasMore]
+      properties:
+        profile: { $ref: "#/components/schemas/SocialProfile" }
+        posts:
+          type: array
+          items: { $ref: "#/components/schemas/SocialPost" }
+        hasMore: { type: boolean }
+    SocialCommentInput:
+      type: object
+      required: [text, requestId]
+      properties:
+        text: { type: string, minLength: 1, maxLength: 1000 }
+        requestId: { type: string, format: uuid }
+    SocialComment:
+      type: object
+      required: [id, text, createdAt, canDelete]
+      properties:
+        id: { type: string, format: uuid }
+        text: { type: string }
+        createdAt: { type: string, format: date-time }
+        canDelete: { type: boolean }
+    SocialCommentsPage:
+      type: object
+      required: [comments, hasMore]
+      properties:
+        comments:
+          type: array
+          items: { $ref: "#/components/schemas/SocialComment" }
+        hasMore: { type: boolean }
+    ModerationQueue:
+      type: object
+      required: [reports]
+      properties:
+        reports:
+          type: array
+          items:
+            type: object
+            required: [id, mediaId, reason, createdAt]
+            properties:
+              id: { type: string, format: uuid }
+              mediaId: { type: string, format: uuid }
+              reason: { type: string }
+              createdAt: { type: string, format: date-time }
+    ImportLinkInput:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string, minLength: 10, maxLength: 4096 }
+    ImportSelectionInput:
+      type: object
+      required: [fileIds]
+      properties:
+        fileIds:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items: { type: string, format: uuid }
+        collection: { type: string, maxLength: 80 }
+        posting: { $ref: "#/components/schemas/PostInput" }
+    ImportActionInput:
+      type: object
+      required: [action]
+      properties:
+        action: { type: string, enum: [cancel, retry] }
+    ImportFile:
+      type: object
+      required: [id, name, size, status, bytesTransferred, error, mediaId]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        size: { type: integer }
+        status: { type: string, enum: [preview, queued, transferring, complete, failed, cancelled, skipped] }
+        bytesTransferred: { type: integer }
+        error: { type: ["string", "null"] }
+        mediaId: { type: ["string", "null"] }
+    ImportJob:
+      type: object
+      required: [id, provider, status, createdAt, expiresAt, error, files]
+      properties:
+        id: { type: string, format: uuid }
+        provider: { type: string, enum: [drive, dropbox, mega] }
+        status: { type: string, enum: [preview, queued, processing, cancelling, complete, failed, cancelled] }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        error: { type: ["string", "null"] }
+        files:
+          type: array
+          items: { $ref: "#/components/schemas/ImportFile" }
+    ImportJobList:
+      type: object
+      required: [jobs]
+      properties:
+        jobs:
+          type: array
+          items: { $ref: "#/components/schemas/ImportJob" }
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    MediaAsset:
+      type: object
+      required:
+        - id
+        - title
+        - collection
+        - originalName
+        - mediaType
+        - contentType
+        - size
+        - isFavorite
+        - progressSeconds
+        - createdAt
+      properties:
+        captureDuplicate:
+          type: boolean
+          description: Capture already existed; original title, collection and publication settings were preserved.
+        id: { type: string, format: uuid }
+        title: { type: string }
+        collection: { type: ["string", "null"], maxLength: 80 }
+        originalName: { type: string }
+        mediaType: { type: string, enum: [image, video] }
+        contentType: { type: string }
+        size: { type: integer }
+        isFavorite: { type: boolean }
+        progressSeconds: { type: ["number", "null"] }
+        createdAt: { type: string, format: date-time }
+    MediaListResponse:
+      type: object
+      required: [items, total, offset]
+      properties:
+        offset: { type: integer, minimum: 0 }
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MediaAsset"
+        total: { type: integer }
+    MediaCollectionsResponse:
+      type: object
+      required: [collections]
+      properties:
+        collections:
+          type: array
+          items: { type: string }
+    MediaSummary:
+      type: object
+      required: [totalItems, videoCount, imageCount, favoriteCount, totalBytes]
+      properties:
+        totalItems: { type: integer }
+        videoCount: { type: integer }
+        imageCount: { type: integer }
+        favoriteCount: { type: integer }
+        totalBytes: { type: integer }
+    UploadUrlInput:
+      type: object
+      required: [name, size, contentType, mediaType]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 255 }
+        size: { type: integer, minimum: 1 }
+        contentType: { type: string, minLength: 1, maxLength: 120 }
+        mediaType: { type: string, enum: [image, video] }
+    UploadUrlResult:
+      type: object
+      required: [uploadUrl, objectKey]
+      properties:
+        uploadUrl: { type: string, format: uri }
+        objectKey: { type: string }
+    PostAttachment:
+      type: object
+      required: [id, contentType, position]
+      properties:
+        id: { type: string, format: uuid }
+        contentType: { type: string }
+        position: { type: integer, minimum: 0 }
+    GalleryPostInput:
+      type: object
+      required: [submissionId, images]
+      properties:
+        submissionId: { type: string, format: uuid }
+        title: { type: string, minLength: 1, maxLength: 255 }
+        collection: { type: ["string", "null"], maxLength: 80 }
+        posting:
+          $ref: "#/components/schemas/PostInput"
+        images:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/GalleryUploadInput"
+    GalleryUploadInput:
+      type: object
+      required: [originalName, objectKey, contentType, size]
+      properties:
+        originalName: { type: string, minLength: 1, maxLength: 255 }
+        objectKey: { type: string, minLength: 1 }
+        contentType: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1, maximum: 5368709120 }
+    CreateMediaInput:
+      type: object
+      required: [title, originalName, contentType, size, mediaType, objectKey]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 255 }
+        originalName: { type: string, minLength: 1, maxLength: 255 }
+        contentType: { type: string, minLength: 1, maxLength: 120 }
+        size: { type: integer, minimum: 1 }
+        mediaType: { type: string, enum: [image, video] }
+        objectKey: { type: string, minLength: 1, maxLength: 1024 }
+        collection: { type: string, minLength: 1, maxLength: 80 }
+        posting: { $ref: "#/components/schemas/PostInput" }
+    UpdateMediaInput:
+      type: object
+      properties:
+        title: { type: string, minLength: 1, maxLength: 255 }
+        collection: { type: ["string", "null"], maxLength: 80 }
+        isFavorite: { type: boolean }
+        progressSeconds: { type: ["number", "null"], minimum: 0 }
+    MediaPreview:
+      type: object
+      required: [status, url, contentType]
+      properties:
+        status: { type: string, enum: [ready, pending, unavailable] }
+        url: { type: ["string", "null"] }
+        contentType: { type: string, enum: [image/jpeg] }
+    MediaViewUrl:
+      type: object
+      required: [url, contentType]
+      properties:
+        url: { type: string, description: "Absolute private URL or same-origin opaque shared stream URL." }
+        contentType: { type: string }
+    WatchFeedResponse:
+      type: object
+      required: [sessionId, items, offset, total, hasMore]
+      properties:
+        sessionId: { type: string, format: uuid }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/WatchFeedItem" }
+        offset: { type: integer }
+        total: { type: integer }
+        hasMore: { type: boolean }
+    WatchFeedItem:
+      type: object
+      required:
+        [id, title, collection, originalName, mediaType, contentType, size, isFavorite, progressSeconds, createdAt, reaction]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        collection: { type: ["string", "null"], maxLength: 80 }
+        originalName: { type: string }
+        mediaType: { type: string, enum: [image, video] }
+        contentType: { type: string }
+        size: { type: integer }
+        isFavorite: { type: boolean }
+        progressSeconds: { type: ["number", "null"] }
+        createdAt: { type: string, format: date-time }
+        reaction: { type: ["string", "null"], enum: [like, dislike, null] }
+    WatchSettings:
+      type: object
+      required: [behaviorEnabled, autoplayEnabled, dataSaverEnabled, alwaysVisibleControls]
+      properties:
+        behaviorEnabled: { type: boolean }
+        autoplayEnabled: { type: ["boolean", "null"] }
+        dataSaverEnabled: { type: boolean }
+        alwaysVisibleControls: { type: boolean, default: false }
+    WatchSettingsUpdate:
+      type: object
+      properties:
+        behaviorEnabled: { type: boolean }
+        autoplayEnabled: { type: boolean }
+        dataSaverEnabled: { type: boolean }
+        alwaysVisibleControls: { type: boolean }
+    WatchReactionInput:
+      type: object
+      required: [reaction]
+      properties:
+        reaction: { type: ["string", "null"], enum: [like, dislike, null] }
+    WatchReaction:
+      type: object
+      required: [mediaId, reaction, likeCount]
+      properties:
+        mediaId: { type: string, format: uuid }
+        reaction: { type: ["string", "null"], enum: [like, dislike, null] }
+        likeCount: { type: integer, minimum: 0 }
+    WatchEventInput:
+      type: object
+      required: [event]
+      properties:
+        event: { type: string, enum: [progress, complete, replay, quick-skip] }
+        watchedSeconds: { type: integer, minimum: 0, maximum: 3600, default: 0 }
+    WatchSignalSummary:
+      type: object
+      required: [mediaId, reaction, watchedSeconds, completions, replays, quickSkips]
+      properties:
+        mediaId: { type: string, format: uuid }
+        reaction: { type: ["string", "null"], enum: [like, dislike, null] }
+        watchedSeconds: { type: integer }
+        completions: { type: integer }
+        replays: { type: integer }
+        quickSkips: { type: integer }
+

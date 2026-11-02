@@ -1,0 +1,35 @@
+kind = "web"
+previewPath = "/"
+title = "ayamai"
+description = "A sophisticated, mobile-first shared collection of adult images, GIFs and videos, with personalized discovery, optional private posts and personal labeling."
+version = "1.0.0"
+id = "artifacts/private-media-library"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25221
+
+[services.development]
+run = "pnpm --filter @workspace/private-media-library run dev"
+
+[services.production]
+serve = "static"
+publicDir = "artifacts/private-media-library/dist/public"
+
+[services.production.build]
+args = [ "pnpm", "--filter", "@workspace/private-media-library", "run", "build" ]
+
+[services.production.build.env]
+PORT = "25221"
+BASE_PATH = "/"
+NODE_ENV = "production"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25221"
+BASE_PATH = "/"
