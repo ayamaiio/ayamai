@@ -1,0 +1,73 @@
+name: ayamai
+
+# The platform's own claim, checked: it runs on Linux, macOS and Windows.
+# The media project (yoru) needs Docker and a database; this workflow only
+# proves the platform — core, gateway, cockpit, llm, agent, cli.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/**"
+      - "projects/*/project.json"
+      - "tools/**"
+      - ".github/workflows/ayamai.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/**"
+      - "projects/*/project.json"
+      - "tools/**"
+      - ".github/workflows/ayamai.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ayamai-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  platform:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: enable pnpm
+        run: corepack enable
+
+      - name: install
+        run: pnpm install --frozen-lockfile
+
+      - name: platform tests
+        shell: bash
+        run: |
+          node --test packages/*/*.test.mjs
+
+      - name: the registry is honest
+        shell: bash
+        run: |
+          node --input-type=module -e "
+            const { loadRegistry } = await import('./packages/core/registry.mjs');
+            const { projects, invalid } = loadRegistry(process.cwd());
+            if (invalid.length) { console.error(invalid); process.exit(1); }
+            console.log('projects:', projects.map(p => p.id).join(', '));
+          "
+
+      - name: documentation has no dead links
+        shell: bash
+        run: node scripts/check-docs.mjs
+
+      - name: doctor on a clean machine
+        shell: bash
+        run: node packages/cli/index.mjs doctor --ci

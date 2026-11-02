@@ -1,0 +1,207 @@
+{
+  "$schema": "ayamai/catalog@2",
+  "people": [
+    {
+      "id": "ikari",
+      "name": "ikari",
+      "jp": "怒",
+      "role": "founder"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "ayamai",
+      "name": "ayamai",
+      "jp": "アヤマイ",
+      "owner": "ikari",
+      "summary": "the ecosystem and everything in it"
+    }
+  ],
+  "entries": [
+    {
+      "id": "platform",
+      "name": "ayamai",
+      "jp": "アヤマイ",
+      "kind": "platform",
+      "summary": "the ecosystem: one door, the agent, the tools",
+      "version": "2026.11.02.4",
+      "path": ".",
+      "docs": [
+        "README.md",
+        "docs/PRODUCT.md"
+      ],
+      "links": [
+        {
+          "label": "front door",
+          "url": "/"
+        }
+      ],
+      "org": "ayamai"
+    },
+    {
+      "id": "gehirn",
+      "name": "gehirn",
+      "jp": "ゲヒルン",
+      "kind": "panel",
+      "summary": "the control panel you are looking at",
+      "version": "2026.11.02.4",
+      "path": "packages/gehirn",
+      "docs": [
+        "docs/projects/gehirn.md"
+      ],
+      "links": [
+        {
+          "label": "panel",
+          "url": "/gehirn/"
+        }
+      ],
+      "org": "ayamai"
+    },
+    {
+      "id": "yoru",
+      "name": "yoru",
+      "jp": "夜",
+      "kind": "project",
+      "summary": "the media library: the loop, the reader, the intake",
+      "version": "2026.11.02.4",
+      "path": "projects/yoru",
+      "docs": [
+        "docs/projects/yoru.md"
+      ],
+      "registryProject": "yoru",
+      "paths": [
+        {
+          "label": "vault",
+          "path": "/mnt/y/ayamai"
+        }
+      ],
+      "links": [
+        {
+          "label": "library",
+          "url": "/yoru/"
+        }
+      ],
+      "org": "ayamai"
+    },
+    {
+      "id": "seiri",
+      "name": "seiri",
+      "jp": "整理",
+      "kind": "project",
+      "summary": "the work in order: plans, repositories, uncommitted files",
+      "version": "2026.11.02.4",
+      "path": "projects/seiri",
+      "docs": [
+        "docs/projects/seiri.md"
+      ],
+      "registryProject": "seiri",
+      "links": [
+        {
+          "label": "seiri",
+          "url": "/seiri/"
+        }
+      ],
+      "org": "ayamai"
+    },
+    {
+      "id": "kata",
+      "name": "kata",
+      "jp": "型",
+      "kind": "project",
+      "summary": "the design library: tokens, components, the editor that writes them",
+      "version": "2026.11.02.4",
+      "path": "projects/kata",
+      "docs": [
+        "docs/projects/kata.md"
+      ],
+      "registryProject": "kata",
+      "links": [
+        {
+          "label": "kata",
+          "url": "/kata/"
+        }
+      ],
+      "org": "ayamai"
+    },
+    {
+      "id": "hisho",
+      "name": "hisho",
+      "jp": "秘書",
+      "kind": "project",
+      "summary": "the secretary: assembles the brief, hands out work, keeps the ledger",
+      "version": "2026.11.02.4",
+      "path": "projects/hisho",
+      "docs": [
+        "docs/projects/hisho.md"
+      ],
+      "registryProject": "hisho",
+      "links": [
+        {
+          "label": "hisho",
+          "url": "/hisho/"
+        }
+      ],
+      "org": "ayamai"
+    },
+    {
+      "id": "tsukai",
+      "name": "tsukai",
+      "jp": "使い",
+      "kind": "project",
+      "summary": "the browser extension: reaches into a page and talks to the door",
+      "version": "2026.11.02.4",
+      "path": "projects/tsukai",
+      "org": "ayamai",
+      "docs": [
+        "docs/projects/tsukai.md"
+      ],
+      "registryProject": "tsukai",
+      "links": [
+        {
+          "label": "tsukai",
+          "url": "/tsukai/"
+        }
+      ]
+    },
+    {
+      "id": "fude",
+      "name": "fude",
+      "jp": "筆",
+      "kind": "project",
+      "summary": "the editor extension: ask the door from VS Code",
+      "version": "2026.11.02.4",
+      "path": "projects/fude",
+      "org": "ayamai",
+      "docs": [
+        "docs/projects/fude.md"
+      ],
+      "registryProject": "fude",
+      "links": [
+        {
+          "label": "fude",
+          "url": "/fude/"
+        }
+      ]
+    },
+    {
+      "id": "gemu",
+      "name": "gemu",
+      "jp": "ゲーム",
+      "kind": "project",
+      "summary": "everything playable: emulators, ROMs, Steam, Epic, GOG, itch",
+      "version": "2026.11.02.4",
+      "path": "projects/gemu",
+      "org": "ayamai",
+      "docs": [
+        "docs/projects/gemu.md"
+      ],
+      "registryProject": "gemu",
+      "links": [
+        {
+          "label": "gemu",
+          "url": "/gemu/"
+        }
+      ]
+    }
+  ]
+}

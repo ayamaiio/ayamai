@@ -1,0 +1,33 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "seiri",
+  "name": "seiri",
+  "version": "2026.11.02.4",
+  "description": "The work in order: plans, repositories, uncommitted files.",
+  "routes": [
+    {
+      "prefix": "/seiri",
+      "service": "app"
+    }
+  ],
+  "services": [
+    {
+      "id": "app",
+      "name": "seiri",
+      "port": 4460,
+      "health": "/seiri/",
+      "start": {
+        "command": "node",
+        "args": [
+          "projects/seiri/index.mjs"
+        ],
+        "env": {
+          "BASE_PREFIX": "/seiri"
+        }
+      }
+    }
+  ],
+  "requires": [
+    "node>=20"
+  ]
+}

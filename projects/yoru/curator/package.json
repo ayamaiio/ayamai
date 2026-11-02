@@ -1,0 +1,11 @@
+{
+  "name": "@workspace/curator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "test": "node --test lib/*.test.mjs tests/*.test.mjs",
+    "build": "node --check server.mjs && node --check pair.mjs"
+  }
+}

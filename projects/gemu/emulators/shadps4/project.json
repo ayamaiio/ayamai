@@ -1,0 +1,25 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "shadps4",
+  "parent": "gemu",
+  "name": "shadps4",
+  "kind": "source",
+  "version": "2026.11.02.4",
+  "description": "PS4 — forked from shadPS4",
+  "upstream": {
+    "repo": "https://github.com/shadps4-emu/shadPS4",
+    "license": "GPL-2.0",
+    "tag": ""
+  },
+  "fork": {
+    "repo": "",
+    "branch": "main"
+  },
+  "emulator": {
+    "key": "shadps4",
+    "exe": "Z:\\Emulators\\shadPS4QtLauncher-win64-qt-2026-07-02-99e9829\\shadPS4QtLauncher.exe",
+    "systems": [
+      "PS4"
+    ]
+  }
+}

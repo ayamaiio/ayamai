@@ -1,0 +1,165 @@
+// The first thing you see at ayamai.local.
+//
+// The landing page's own composition — void, serif wordmark, the portrait, one
+// red slash — with a single job: an invitation in. The button says "enter",
+// because the room introduces itself once you are inside.
+
+/** Pure: what the status line says. Injected into the page, so there is one copy. */
+export function formatStatus(services) {
+  if (!Array.isArray(services) || services.length === 0) return { tone: "dim", text: "checking…" };
+  // Toys and projects this machine cannot run are not failures — they are absent.
+  const expected = services.filter((service) => service.kind !== "toy" && !service.absent);
+  const absent = services.filter((service) => service.absent).length;
+  if (expected.length === 0) return { tone: "dim", text: "nothing expected here" };
+  const up = expected.filter((service) => service.up).length;
+  const total = expected.length;
+  const down = expected.filter((service) => !service.up).map((service) => service.name);
+  const suffix = absent ? ` · ${absent} not installed` : "";
+  if (up === 0) return { tone: "red", text: `none of ${total} up${suffix}` };
+  if (up === total) return { tone: "ok", text: `${total} of ${total} up${suffix}` };
+  return { tone: "warn", text: `${up} of ${total} up · ${down.join(", ")} down${suffix}` };
+}
+
+export function renderWelcome({ origin = "http://ayamai.local", hostname = "" } = {}) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="theme-color" content="#0b0d14" />
+<meta name="robots" content="noindex,nofollow" />
+<title>ayamai</title>
+<link rel="icon" href="/gehirn/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="/gehirn/favicon-32x32.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" />
+<style>
+  :root { --void:#0b0d14; --ink:#e6ecff; --dim:#a3adc3; --rei:#a9b7e8; --line:#202a5a;
+          --red:#e53935; --ok:#91b7b3; --warn:#cead9a; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--void); color: var(--ink); overflow: hidden;
+    font: 400 15px/1.6 Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+  .hero { position: relative; height: 100dvh; display: flex; align-items: center;
+          padding: 0 clamp(24px, 13vw, 200px); cursor: pointer; }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(11,13,20,.97), rgba(11,13,20,.85) 30%, rgba(11,13,20,.35) 55%, transparent 80%),
+      linear-gradient(0deg, rgba(11,13,20,.75), transparent 32%);
+  }
+  .portrait { position: absolute; inset: 0; z-index: 0; }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center 42%; display: block; }
+  .copy { position: relative; z-index: 2; max-width: 560px; animation: arrive 500ms ease-out both; }
+  @keyframes arrive { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .copy { animation: none; } }
+  h1 { margin: 0; font: 400 clamp(48px, 7vw, 92px)/1 "Cormorant Garamond", Georgia, serif;
+       letter-spacing: .18em; white-space: nowrap; }
+  .jp { margin: 12px 0 0 4px; font: 400 18px/1.3 "Cormorant Garamond", serif;
+        letter-spacing: .5em; color: rgba(230,236,255,.9); }
+  .sub { margin: 24px 0 0; font: italic 17px/1.6 "Cormorant Garamond", Georgia, serif;
+         letter-spacing: .04em; color: rgba(230,236,255,.86); }
+  .slash { display: block; width: 2px; height: 32px; margin: 26px 0 0 2px;
+           background: var(--red); transform: skew(-28deg); }
+  .enter { display: inline-flex; align-items: center; gap: 10px; margin-top: 34px;
+           padding: 13px 26px; border: 1px solid var(--line); border-radius: 8px;
+           background: rgba(32,42,90,.5); color: var(--ink); text-decoration: none;
+           font: 500 11px/1 "IBM Plex Mono", ui-monospace, monospace;
+           letter-spacing: .28em; text-transform: uppercase;
+           transition: border-color .2s, background .2s; }
+  .enter:hover { border-color: var(--rei); background: rgba(169,183,232,.16); }
+  .enter:focus-visible { outline: 2px solid var(--rei); outline-offset: 2px; }
+  .enter span { color: var(--rei); }
+  .status { display: flex; align-items: center; gap: 8px; margin: 18px 0 0;
+            font: 400 10px/1 "IBM Plex Mono", ui-monospace, monospace;
+            letter-spacing: .14em; text-transform: uppercase; color: rgba(163,173,195,.72); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dim); flex: none; }
+  .dot.ok { background: var(--ok); }
+  .dot.warn { background: var(--warn); }
+  .dot.red { background: var(--red); }
+  .also { margin-top: 16px; font: 500 9px/1 "IBM Plex Mono", monospace; letter-spacing: .2em;
+          text-transform: uppercase; color: rgba(163,173,195,.6); }
+  .also a { color: var(--dim); text-decoration: none; margin-right: 16px; }
+  .also a:hover { color: var(--ink); }
+  .foot { position: absolute; inset: auto 0 0; z-index: 2; display: flex; justify-content: space-between;
+          padding: 20px clamp(24px, 6vw, 90px); color: rgba(163,173,195,.65);
+          font: 9px "IBM Plex Mono", monospace; letter-spacing: .08em; }
+  @media (max-width: 760px) {
+    .hero { align-items: flex-end; padding: 0 26px 16vh; }
+    .hero::before { background:
+      linear-gradient(0deg, rgba(11,13,20,.97), rgba(11,13,20,.8) 26%, rgba(11,13,20,.1) 64%, transparent 84%); }
+    h1 { font-size: clamp(38px, 11vw, 64px); letter-spacing: .12em; }
+    .enter { width: 100%; justify-content: center; }
+    .foot { padding: 16px 26px; font-size: 8px; }
+  }
+</style>
+</head>
+<body>
+  <section class="hero" id="hero">
+    <div class="portrait"><img src="/gehirn/portrait.png" alt="" /></div>
+    <div class="copy">
+      <h1>A Y A M A I</h1>
+      <p class="jp" lang="ja">&#12450;&#12516;&#12510;&#12452;</p>
+      <p class="sub">A quiet place to run things.</p>
+      <span class="slash" aria-hidden="true"></span>
+      <div>
+        <a class="enter" href="/gehirn/" id="enter">enter <span>&#8594;</span></a>
+      </div>
+      <p class="status" aria-live="polite"><span class="dot" id="dot"></span><span id="status">checking…</span></p>
+      <p class="also">
+        <a href="/yoru/">yoru</a>
+        <a href="/agent/capabilities">agent</a>
+        <a href="/healthz">health</a>
+      </p>
+    </div>
+  </section>
+  <footer class="foot">
+    <span>LOCAL · ${hostname ? escapeHtml(hostname) : "this machine"}</span>
+    <span>${escapeHtml(origin.replace(/^https?:\/\//, ""))}</span>
+  </footer>
+  <script>
+  (function () {
+    var formatStatus = ${formatStatus.toString()};
+
+    var dot = document.getElementById("dot");
+    var label = document.getElementById("status");
+
+    function show(tone, text) {
+      dot.className = "dot " + tone;
+      label.textContent = text;
+    }
+
+    function tick() {
+      fetch("/health.json", { cache: "no-store" })
+        .then(function (response) { if (!response.ok) throw new Error("health"); return response.json(); })
+        .then(function (data) { var line = formatStatus(data.services); show(line.tone, line.text); })
+        .catch(function () { show("dim", "no answer"); });
+    }
+
+    tick();
+    setInterval(tick, 5000);
+
+    function go() { window.location.href = "/gehirn/"; }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); go(); }
+    });
+
+    document.getElementById("hero").addEventListener("click", function (event) {
+      if (event.target.closest("a")) return;
+      go();
+    });
+  })();
+  </script>
+</body>
+</html>`;
+}
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[char]);
+}

@@ -1,0 +1,25 @@
+# Preparation only: do not use this file as a production deployment config.
+# Requires an isolated synthetic-only API, database and private R2 bucket.
+# Workers Free is selected in the account, not by a setting in this file.
+name = "ayamai-edge-canary"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+
+# Canary-only exception: no purchased domain is needed.
+# This hostname is publicly reachable; media still requires per-request tickets.
+workers_dev = true
+preview_urls = false
+
+[observability]
+enabled = false
+
+[vars]
+# Leave unusable until the isolated API origin and ingress are verified.
+AUTH_API_ORIGIN = "https://replace-with-isolated-canary-api.invalid"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "ayamai-edge-canary"
+
+# Store EDGE_SERVICE_SECRET in Cloudflare's secrets controls.
+# Do not add production credentials, production routes or public R2 access.

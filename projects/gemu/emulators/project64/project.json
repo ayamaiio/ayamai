@@ -1,0 +1,25 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "project64",
+  "parent": "gemu",
+  "name": "project64",
+  "kind": "source",
+  "version": "2026.11.02.4",
+  "description": "N64 — forked from Project64",
+  "upstream": {
+    "repo": "https://github.com/project64/project64",
+    "license": "GPL-2.0",
+    "tag": ""
+  },
+  "fork": {
+    "repo": "",
+    "branch": "main"
+  },
+  "emulator": {
+    "key": "project64",
+    "exe": "Z:\\Emulators\\Luna_Project64\\Project64.exe",
+    "systems": [
+      "N64"
+    ]
+  }
+}

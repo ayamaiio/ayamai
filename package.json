@@ -1,0 +1,50 @@
+{
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "test:browser-capture": "node --test extensions/browser-capture/source.test.mjs && pnpm --filter @workspace/scripts exec tsx --test ../projects/yoru/api/src/lib/browser-capture.test.ts && pnpm --filter @workspace/private-media-library exec vitest run --config vitest.config.ts src/lib/capture-protocol.test.ts src/lib/use-browser-capture.test.tsx",
+    "test:label-datasets": "pnpm --filter @workspace/scripts exec tsx --test ../projects/yoru/api/src/lib/label-datasets.test.ts",
+    "test:edge-authorization": "node --test infrastructure/shared-media-edge/worker.test.mjs && pnpm --filter @workspace/scripts exec tsx --test ../projects/yoru/api/src/lib/media-authorization-budget.test.ts ../projects/yoru/api/src/lib/social.test.ts",
+    "test:edge-canary": "node --check infrastructure/shared-media-edge/canary/harness/measure.js && node --test infrastructure/shared-media-edge/canary/canary.test.mjs infrastructure/shared-media-edge/worker.test.mjs",
+    "check:edge-canary": "node infrastructure/shared-media-edge/canary/readiness.mjs",
+    "test:shared-delivery": "node --test infrastructure/shared-media-edge/worker.test.mjs && pnpm --filter @workspace/scripts exec tsx --test ../projects/yoru/api/src/lib/media-tickets.test.ts ../projects/yoru/api/src/lib/media-stream-cancellation.test.ts",
+    "test:previews": "pnpm --filter @workspace/scripts exec tsx --test --test-concurrency=1 ../projects/yoru/api/src/lib/preview-render.test.ts ../projects/yoru/api/src/lib/media-previews.test.ts",
+    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "test:validation": "pnpm --filter @workspace/scripts exec tsx --test ../projects/yoru/api-zod/tests/validation.test.ts",
+    "test:founder-access": "pnpm --filter @workspace/scripts exec tsx --test ../projects/yoru/api/src/lib/founder-access.test.ts ../projects/yoru/api/src/lib/membership.test.ts",
+    "test:imports": "pnpm --filter @workspace/scripts exec tsx --test --test-concurrency=1 ../projects/yoru/api/src/lib/imports/imports.test.ts ../projects/yoru/api/src/lib/imports/worker-poller.test.ts ../projects/yoru/api/src/lib/imports/cloud-api.test.ts ../projects/yoru/api/src/lib/imports/cloud-accounts.test.ts",
+    "test:social": "pnpm --filter @workspace/scripts exec tsx --test ../projects/yoru/api/src/lib/social.test.ts ../projects/yoru/api/src/lib/social-ranking.test.ts ../projects/yoru/api/src/lib/social-discovery.test.ts ../projects/yoru/api/src/lib/annotation-labels.test.ts ../projects/yoru/api/src/lib/social-saved.test.ts ../projects/yoru/api/src/lib/creator-videos.test.ts",
+    "test:watch": "pnpm --filter @workspace/scripts exec tsx --test --test-concurrency=1 ../projects/yoru/api/src/lib/watch-account-isolation.test.ts",
+    "test:watch-mobile": "node scripts/watch-mobile-lifecycle.mjs",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --filter \"./apps/**\" --if-present run typecheck",
+    "test:snapshot": "node --test scripts/dev-snapshot/tests/snapshot.test.mjs",
+    "test:snapshot:integration": "node --test scripts/dev-snapshot/tests/postgres.test.mjs",
+    "magi": "pnpm --filter magi storybook",
+    "setup": "python3 scripts/local-dev.py setup",
+    "dev": "python3 scripts/local-dev.py start",
+    "dev:preflight": "python3 scripts/local-dev.py preflight",
+    "dev:status": "python3 scripts/local-dev.py status",
+    "dev:stop": "python3 scripts/local-dev.py stop",
+    "dev:logs": "python3 scripts/local-dev.py logs",
+    "test:local-dev": "python3 -B -m unittest discover -s scripts/tests -p test_local_dev.py",
+    "test:curator": "pnpm --filter @workspace/curator test",
+    "test:curator-api": "pnpm --filter @workspace/scripts exec tsx --test ../projects/yoru/api/src/lib/curator.test.ts",
+    "curator:pair": "node projects/yoru/curator/pair.mjs",
+    "ayamai": "node packages/cli/index.mjs",
+    "test:ayamai": "node --test packages/core/*.test.mjs packages/gateway/*.test.mjs packages/cockpit/*.test.mjs packages/llm/*.test.mjs",
+    "check:docs": "node scripts/check-docs.mjs"
+  },
+  "private": true,
+  "packageManager": "pnpm@10.34.9",
+  "dependencies": {
+    "@replit/connectors-sdk": "^0.4.3"
+  },
+  "devDependencies": {
+    "browserstack-local": "1.5.16",
+    "prettier": "^3.9.10",
+    "typescript": "~5.9.3"
+  }
+}

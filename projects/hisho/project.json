@@ -1,0 +1,33 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "hisho",
+  "name": "hisho",
+  "version": "2026.11.02.4",
+  "description": "The secretary: assembles the brief, hands out work, keeps the ledger.",
+  "routes": [
+    {
+      "prefix": "/hisho",
+      "service": "app"
+    }
+  ],
+  "services": [
+    {
+      "id": "app",
+      "name": "hisho",
+      "port": 4650,
+      "health": "/hisho/",
+      "start": {
+        "command": "node",
+        "args": [
+          "projects/hisho/index.mjs"
+        ],
+        "env": {
+          "BASE_PREFIX": "/hisho"
+        }
+      }
+    }
+  ],
+  "requires": [
+    "node>=20"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "ayamai",
+  "version": "0.1.0",
+  "description": "Send this page — or a question about it — to ayamai on this machine.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["http://ayamai.local/*", "http://localhost:25222/*", "http://127.0.0.1:25222/*"],
+  "action": { "default_popup": "popup.html", "default_title": "ayamai" },
+  "background": { "service_worker": "background.js" }
+}

@@ -1,0 +1,28 @@
+- [Zod compatibility](zod-compatibility.md) — do not downgrade validation to Zod 3 to solve generator compatibility issues.
+- [Product direction](product-direction.md) — shared/public-first, post-first creation; image/GIF galleries share labels and recommendations; optional anonymity/privacy, not monetization-led.
+- [Brand direction](brand-direction.md) — exact name ayamai; ayamai.io domain; Rei Ayanami inspiration; retain the dark blue style.
+- [Watch recommendation cycles](watch-recommendation-cycles.md) — keep each account’s feed order fixed during a cycle; apply new feedback in the next cycle.
+- [Cloud import SDK upgrades](cloud-import-sdk-upgrades.md) — check child-object transport behavior and runtime identifiers when upgrading provider SDKs.
+- [Cloud folder authorization](cloud-folder-authorization.md) — per-viewer OAuth, not owner-level connectors; arbitrary folder descendants require account-wide read-only access.
+- [Library preview policy](library-preview-policy.md) — generate legacy previews on demand; avoid automatically downloading entire archives at startup.
+- [Library browsing policy](library-browsing-policy.md) — browser-local account bookmarks; missing anchors restart within saved filters rather than guessing numeric positions.
+- [Shared delivery boundary](shared-delivery-boundary.md) — edge offload must preserve per-request authorization, server-only storage locators and private R2.
+- [Saved ordering](saved-ordering.md) — historical saves have no save time; deterministic browsing must not claim newest-saved-first.
+- [Infinite-query refresh](infinite-query-refresh.md) — polling refetches every loaded page; budget freshness against endpoint request limits.
+- [Browser codec testing](browser-codec-testing.md) — distinguish test-runtime H.264 limitations from streaming failures; use supported benign fixtures.
+- [BrowserStack access constraints](browserstack-auth-challenge.md) — never automate OTPs; Automate access does not imply screen-reader entitlement.
+- [Screen-reader speech](screen-reader-speech-verification.md) — native slider events can override live speech; capture real utterances promptly rather than trusting ARIA alone.
+- [Edge canary constraints](edge-canary-constraints.md) — isolated iPhone scope, updated spending approval and account-owned Cloudflare token verification.
+- [Cloudflare runtime validation](cloudflare-runtime-validation.md) — verify the active phase and native Request behavior; Node tests and accepted uploads are insufficient.
+- [Product analytics privacy](analytics-privacy.md) — aggregate outcomes only; keep content and detailed recommendation behavior out of external analytics.
+- [Personal playback markers](personal-playback-progress.md) — viewing position is private per-viewer history; browser-local fallback is not cross-device sync.
+- [Watch overlay behavior](watch-overlay-policy.md) — fade controls during passive viewing; reveal-only first taps must preserve likes, scrolling, seeking and accessibility.
+- [iOS Safari lifecycle](ios-safari-lifecycle.md) — iOS Safari may pause before `visibilitychange`; preserve play intent briefly without overriding explicit pauses.
+- [Age-gated UI testing](age-gated-ui-testing.md) — synthetic sign-in does not authorize adult/policy attestations; API fixture cleanup is not gated UI verification.
+- [Database failure boundary](database-error-boundary.md) — contain idle-pool faults; preserve query errors and never blindly replay writes after connection resets.
+- [Workspace navigation](workspace-navigation.md) — verify private app location directly; do not guess Projects/Remix menus or use public profiles to find it.
+- [Label datasets](label-dataset-policy.md) — freeze label truth, not access rights; browser download requests are not confirmed disk saves.
+- [Browser capture boundary](browser-capture-policy.md) — anonymous selected files only; pairing and deduplication must preserve account, storage and label boundaries.
+- [Invitation access policy](invitation-access-policy.md) — one app sign-in, owner-gated membership, and five invitee slots; keep provider-level sign-in gates out of the access path.
+- [Referenced TypeScript declarations](typescript-reference-declarations.md) — missing client exports may be stale declarations; rebuild the referenced package before editing source.
+- [Native touch automation](native-touch-automation.md) — validate trusted coordinates and hold timing before treating an iOS driver-input failure as a Watch regression.

@@ -1,0 +1,57 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "yoru",
+  "name": "yoru",
+  "version": "2026.11.02.4",
+  "description": "The media library: the loop, the reader, the intake.",
+  "routes": [
+    {
+      "prefix": "/yoru",
+      "service": "app"
+    }
+  ],
+  "services": [
+    {
+      "id": "app",
+      "name": "yoru app",
+      "port": 25322,
+      "health": "/yoru/",
+      "start": {
+        "command": "python3",
+        "args": [
+          "scripts/local-dev.py",
+          "start",
+          "--service",
+          "web"
+        ],
+        "env": {
+          "BASE_PATH": "/yoru",
+          "API_PROXY_TARGET": "http://127.0.0.1:8081"
+        }
+      }
+    },
+    {
+      "id": "api",
+      "name": "yoru api",
+      "port": 8081,
+      "health": "/api/healthz",
+      "start": {
+        "command": "python3",
+        "args": [
+          "scripts/local-dev.py",
+          "start",
+          "--service",
+          "api"
+        ]
+      }
+    }
+  ],
+  "requires": [
+    "node>=20",
+    "pnpm>=10",
+    "docker"
+  ],
+  "data": {
+    "dir": "{data}/yoru"
+  }
+}

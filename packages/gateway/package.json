@@ -1,0 +1,9 @@
+{
+  "name": "@ayamai/gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "One door: path routing for the platform and its projects.",
+  "bin": { "ayamai-gateway": "./index.mjs" },
+  "scripts": { "test": "node --test index.test.mjs" }
+}

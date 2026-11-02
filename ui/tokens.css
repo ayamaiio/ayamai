@@ -1,0 +1,24 @@
+/* generated from projects/kata/tokens.json - do not edit */
+:root {
+  --void: #0b0d14;
+  --pale: #e6ecff;
+  --line: #202a5a;
+  --card: #151d2e;
+  --rei: #a9b7e8;
+  --violet: #b0a9dc;
+  --dim: #a3adc3;
+  --ok: #91b7b3;
+  --warn: #cead9a;
+  --red: #e53935;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 0.75rem;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --serif: "Cormorant Garamond", "Iowan Old Style", Palatino, Georgia, serif;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
