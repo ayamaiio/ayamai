@@ -1,0 +1,25 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "ppsspp",
+  "parent": "gemu",
+  "name": "ppsspp",
+  "kind": "source",
+  "version": "2026.11.02.7",
+  "description": "PSP — forked from PPSSPP",
+  "upstream": {
+    "repo": "https://github.com/hrydgard/ppsspp",
+    "license": "GPL-2.0",
+    "tag": ""
+  },
+  "fork": {
+    "repo": "",
+    "branch": "main"
+  },
+  "emulator": {
+    "key": "ppsspp",
+    "exe": "C:\\Program Files\\PPSSPP\\PPSSPPWindows64.exe",
+    "systems": [
+      "PSP"
+    ]
+  }
+}

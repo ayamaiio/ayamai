@@ -1,0 +1,12 @@
+{
+  "name": "ayamai-edge-canary-api",
+  "account_id": "53dcf89689e1f019f32eacc9be31cd6b",
+  "main": "authority.mjs",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "vars": { "CANARY_ONLY": "synthetic-v1", "CANARY_BUCKET": "ayamai-edge-canary" },
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "ayamai-edge-canary" }],
+  "d1_databases": [{ "binding": "DB", "database_name": "ayamai-edge-canary-db", "database_id": "f64fbb8b-3092-497e-aaff-ca0d06a73776" }]
+}

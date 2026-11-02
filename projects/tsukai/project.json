@@ -1,0 +1,33 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "tsukai",
+  "name": "tsukai",
+  "version": "2026.11.02.7",
+  "description": "the browser extension: reaches into a page and talks to the door",
+  "routes": [
+    {
+      "prefix": "/tsukai",
+      "service": "app"
+    }
+  ],
+  "services": [
+    {
+      "id": "app",
+      "name": "tsukai",
+      "port": 4655,
+      "health": "/tsukai/",
+      "start": {
+        "command": "node",
+        "args": [
+          "projects/tsukai/server.mjs"
+        ],
+        "env": {
+          "BASE_PREFIX": "/tsukai"
+        }
+      }
+    }
+  ],
+  "requires": [
+    "node>=20"
+  ]
+}

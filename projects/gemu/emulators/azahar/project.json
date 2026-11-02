@@ -1,0 +1,28 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "azahar",
+  "parent": "gemu",
+  "name": "azahar",
+  "kind": "source",
+  "version": "2026.11.02.7",
+  "description": "3DS — forked from Azahar",
+  "upstream": {
+    "repo": "https://github.com/azahar-emu/azahar",
+    "license": "GPL-3.0",
+    "tag": "2127.0-alpha4",
+    "branch": "master"
+  },
+  "fork": {
+    "repo": "https://github.com/ayamaiio/azahar",
+    "branch": "master",
+    "forkedAt": "2127.0-alpha4",
+    "organisation": "ayamaiio"
+  },
+  "emulator": {
+    "key": "azahar",
+    "exe": "C:\\Program Files\\Azahar\\azahar.exe",
+    "systems": [
+      "3DS"
+    ]
+  }
+}

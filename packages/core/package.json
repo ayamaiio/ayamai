@@ -1,0 +1,12 @@
+{
+  "name": "@ayamai/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./registry": "./registry.mjs"
+  },
+  "scripts": {
+    "test": "node --test registry.test.mjs"
+  }
+}

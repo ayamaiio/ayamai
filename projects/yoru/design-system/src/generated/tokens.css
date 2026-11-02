@@ -1,0 +1,24 @@
+/* generated from projects/kata/tokens.json - do not edit */
+@theme {
+  --color-void: #0b0d14;
+  --color-pale: #e6ecff;
+  --color-line: #202a5a;
+  --color-card: #151d2e;
+  --color-rei: #a9b7e8;
+  --color-violet: #b0a9dc;
+  --color-dim: #a3adc3;
+  --color-ok: #91b7b3;
+  --color-warn: #cead9a;
+  --color-red: #e53935;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 0.75rem;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --font-serif: "Cormorant Garamond", "Iowan Old Style", Palatino, Georgia, serif;
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}

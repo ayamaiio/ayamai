@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "ZIZsXOFi7ATmI0uEkhChu"
+uri = "file://artifacts/private-media-library/public/logo.svg"
+type = "image"
+title = "ayamai — logo mark"
+description = "Original SVG mark inspired by the restrained blue palette and geometric visual language of Rei Ayanami / NGE."
+logical_id = "04b01450-70e7-4634-b3b3-9508cc571937"
+content_hash = "sha256:87a4fdd8762a0b8745f4b11147893cfd4d35f7b64ac9e7b8b1f1184291cb87ac"
+size = 372
+mtime_ms = 1793318771510
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:d6914998-9a41-4dbc-9568-bc074169df79/04b01450-70e7-4634-b3b3-9508cc571937/03718ef2-74af-41ef-97bf-bb4df2af5712"
+storage_version_token = "1793319034218814"
+content_type = "image/svg+xml"

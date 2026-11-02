@@ -1,0 +1,25 @@
+{
+  "$schema": "ayamai/project@1",
+  "id": "eden",
+  "parent": "gemu",
+  "name": "eden",
+  "kind": "source",
+  "version": "2026.11.02.7",
+  "description": "Switch — forked from Eden",
+  "upstream": {
+    "repo": "https://git.eden-emu.dev/eden-emu/eden",
+    "license": "GPL-3.0",
+    "tag": ""
+  },
+  "fork": {
+    "repo": "",
+    "branch": "main"
+  },
+  "emulator": {
+    "key": "eden",
+    "exe": "Z:\\Emulators\\Eden-Windows-v0.2.1-amd64-clang-pgo\\eden.exe",
+    "systems": [
+      "Switch"
+    ]
+  }
+}

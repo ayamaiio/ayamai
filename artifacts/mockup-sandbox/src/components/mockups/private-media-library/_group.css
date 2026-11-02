@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+:root {
+  --background: 42 36% 95%;
+  --foreground: 177 19% 17%;
+  --card: 40 34% 98%;
+  --card-foreground: 177 19% 17%;
+  --border: 40 17% 85%;
+  --input: 40 17% 85%;
+  --ring: 162 34% 42%;
+  --primary: 162 34% 34%;
+  --primary-foreground: 42 36% 97%;
+  --secondary: 36 36% 88%;
+  --secondary-foreground: 177 19% 17%;
+  --muted: 39 22% 90%;
+  --muted-foreground: 175 9% 43%;
+  --accent: 15 55% 63%;
+  --accent-foreground: 22 32% 13%;
+  --destructive: 4 65% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --popover: 40 34% 98%;
+  --popover-foreground: 177 19% 17%;
+  --app-font-sans: 'DM Sans', sans-serif;
+  --app-font-serif: 'Instrument Serif', serif;
+  --app-font-mono: 'DM Sans', sans-serif;
+  --radius: 1rem;
+  color-scheme: light;
+}
+
+.dark {
+  --background: 177 21% 11%;
+  --foreground: 40 29% 92%;
+  --card: 177 18% 15%;
+  --card-foreground: 40 29% 92%;
+  --border: 177 12% 26%;
+  --input: 177 12% 26%;
+  --ring: 158 33% 56%;
+  --primary: 158 33% 56%;
+  --primary-foreground: 177 21% 11%;
+  --secondary: 177 13% 23%;
+  --secondary-foreground: 40 29% 92%;
+  --muted: 177 13% 23%;
+  --muted-foreground: 174 9% 67%;
+  --accent: 15 55% 63%;
+  --accent-foreground: 177 21% 11%;
+  --destructive: 4 65% 55%;
+  --destructive-foreground: 0 0% 98%;
+  --popover: 177 18% 15%;
+  --popover-foreground: 40 29% 92%;
+}

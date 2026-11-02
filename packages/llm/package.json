@@ -1,0 +1,9 @@
+{
+  "name": "@ayamai/llm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Providers, keys and one request. No SDK.",
+  "exports": { ".": "./index.mjs" },
+  "scripts": { "test": "node --test index.test.mjs" }
+}
